@@ -30,12 +30,13 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatus status,
             WebRequest request) {
         List<String> errors = new ArrayList<>();
-        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
             errors.add(error.getField() + ": " + error.getDefaultMessage());
-        }
-        for (ObjectError error : ex.getBindingResult().getGlobalErrors()) {
+        });
+
+        ex.getBindingResult().getGlobalErrors().forEach(error -> {
             errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
-        }
+        });
 
         ApiException apiException =
                 new ApiException(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);

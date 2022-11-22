@@ -10,10 +10,6 @@ import com.epam.rd.validations.ResponseErrorValidation;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +28,6 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class AccountController {
 
-    private final JWTTokenProvider jwtTokenProvider;
-    private final AuthenticationManager authenticationManager;
     private final ResponseErrorValidation responseErrorValidation;
     private final UserService userService;
 
@@ -45,14 +39,7 @@ public class AccountController {
         ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
         if (!ObjectUtils.isEmpty(errors)) return errors;
 
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginRequest.getEmail(),
-                loginRequest.getPassword()
-        ));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtTokenProvider.generateToken(authentication);
-
-        return ResponseEntity.ok(new JWTTokenSuccessResponse(true, jwt));
+        return ResponseEntity.ok(userService.getJwtAfterUserAuthentication(loginRequest));
     }
 
     /**

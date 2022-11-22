@@ -2,6 +2,7 @@ package com.epam.rd.model.entity;
 
 import com.epam.rd.model.enumerations.Gender;
 import com.epam.rd.model.enumerations.URole;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import java.util.Set;
 @Setter
 @Entity(name = "users")
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
