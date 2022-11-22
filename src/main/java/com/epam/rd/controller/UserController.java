@@ -1,21 +1,12 @@
 package com.epam.rd.controller;
 
-import com.epam.rd.entity.User;
+import com.epam.rd.model.entity.User;
 import com.epam.rd.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
-
-
-/**
- *
- * controller For updating profile data
- *
- *
- * */
-
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +16,12 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/all")
-    public List<User> getAll (Principal principal){
-        return userService.getAll();
+    public List<User> getAll() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("check/{email}")
+    public ResponseEntity<Boolean> checkIfUserExistByEmail(@PathVariable(name = "email") String email) {
+        return ResponseEntity.ok(userService.isUserExistByEmail(email));
     }
 }

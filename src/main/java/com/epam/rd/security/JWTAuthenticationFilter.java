@@ -1,6 +1,6 @@
 package com.epam.rd.security;
 
-import com.epam.rd.entity.User;
+import com.epam.rd.model.entity.User;
 import com.epam.rd.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,7 +35,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }

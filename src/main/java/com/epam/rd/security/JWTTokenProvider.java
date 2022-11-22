@@ -1,7 +1,7 @@
 package com.epam.rd.security;
 
-import com.epam.rd.entity.User;
-import com.epam.rd.enumirations.URoles;
+import com.epam.rd.model.entity.User;
+import com.epam.rd.model.enumerations.URole;
 import com.epam.rd.service.UserService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class JWTTokenProvider {
     public String generateToken(Authentication authentication) {
 
         User user = (User) authentication.getPrincipal();
-        URoles role = userService.getByUsername(user.getUsername()).getURoles();
+        URole role = userService.getUserByEmail(user.getUsername()).getRole();
         Date now = new Date(System.currentTimeMillis());
         Date expiryDate = new Date(now.getTime() + SecurityConstants.EXPIRATION_TIME);
 

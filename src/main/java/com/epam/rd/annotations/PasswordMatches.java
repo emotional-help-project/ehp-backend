@@ -1,7 +1,6 @@
 package com.epam.rd.annotations;
 
 
-
 import com.epam.rd.validations.PasswordMatchesValidator;
 
 import javax.validation.Constraint;
@@ -13,9 +12,9 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = PasswordMatchesValidator.class)
 @Documented
 public @interface PasswordMatches {
-    String message() default "Password do not match";
+    String message() default "Password does not match";
 
-    Class<?>[] groups() default{};
+    Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 }

@@ -1,6 +1,6 @@
 package com.epam.rd.service;
 
-import com.epam.rd.entity.User;
+import com.epam.rd.model.entity.User;
 import com.epam.rd.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,27 +20,30 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Username not found with username: " + username));
+    public UserDetails loadUserByUsername(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Not found user with email: " + email));
 
         return build(user);
     }
 
     public User loadUserById(Long id) {
-        return userRepository.findUserById(id).orElse(null);
+        return userRepository.findById(id).orElse(null);
     }
 
-    public static User build(User user) {
+    private static User build(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toList());
 
         return new User(
                 user.getId(),
-                user.getUsername(),
-                user.getName(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
                 user.getPassword(),
+                user.getGender(),
+                user.getAge(),
                 authorities);
     }
 
