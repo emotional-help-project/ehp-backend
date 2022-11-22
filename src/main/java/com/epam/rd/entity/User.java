@@ -4,17 +4,18 @@ import com.epam.rd.enumirations.URoles;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity(name = "app_user")
-@RequiredArgsConstructor
-public class User{
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,5 +31,54 @@ public class User{
     @CollectionTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"))
     private Set<URoles> roles = new HashSet<>();
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
 
+    public User() {}
+
+    public User(Long id,
+                String username,
+                String name,
+                String password,
+                Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
+        this.username = username;
+        this.name = name;
+        this.password = password;
+        this.authorities = authorities;
+    }
+/**
+ * Security
+
+ */
+
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.username;
+    }
 }
