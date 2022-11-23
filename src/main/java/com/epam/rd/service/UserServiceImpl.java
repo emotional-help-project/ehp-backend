@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
         if (isUserExistByEmail(signupRequest.getEmail())) {
             throw new UserExistException("The user with email " + signupRequest.getEmail() + " already exists. Please check credentials.");
         }
-        return userMapper.userToDto(userRepository.save(user));
+        return userMapper.toDto(userRepository.save(user));
     }
 
     @Transactional
@@ -60,14 +60,14 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserByPrincipal(Principal principal) {
         User user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST));
-        return userMapper.userToDto(user);
+        return userMapper.toDto(user);
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(userMapper::userToDtoWithoutPassword)
+                .map(userMapper::toDto)
                 .toList();
     }
 
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
         if (email != null) {
             currentUser = userRepository.findByEmail(email).orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST));
         }
-        return userMapper.userToDto(currentUser);
+        return userMapper.toDto(currentUser);
     }
 
     private String getPrincipal() {
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserByEmail(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST));
-        return userMapper.userToDto(user);
+        return userMapper.toDto(user);
     }
 
     @Transactional(readOnly = true)
