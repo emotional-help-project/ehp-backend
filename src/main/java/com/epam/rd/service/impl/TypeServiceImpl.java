@@ -28,7 +28,7 @@ public class TypeServiceImpl implements TypeService {
 
     @Override
     public Type create(Type entity) {
-        if (entity.getId()==null){
+        if (entity.getId() == null) {
             return typeRepository.save(entity);
         }
         throw new BadRequest("ID  must be  null");
@@ -36,8 +36,8 @@ public class TypeServiceImpl implements TypeService {
 
     @Override
     public Type update(Type entity) {
-        if (entity.getId()!=null){
-        return typeRepository.save(entity);
+        if (entity.getId() != null) {
+            return typeRepository.save(entity);
         }
         throw new BadRequest("ID must not be null");
     }
@@ -49,9 +49,9 @@ public class TypeServiceImpl implements TypeService {
 
     }
 
-   @Override
-    public boolean delete(Long ID){
+    @Override
+    public boolean delete(Long ID) {
         typeRepository.deleteById(ID);
         return true;
-   }
+    }
 }
