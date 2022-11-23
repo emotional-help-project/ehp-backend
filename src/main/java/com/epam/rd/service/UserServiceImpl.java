@@ -1,9 +1,11 @@
 package com.epam.rd.service;
 
 import com.epam.rd.exceptions.UserProcessingException;
+import com.epam.rd.model.dto.UserDto;
 import com.epam.rd.model.entity.User;
 import com.epam.rd.model.enumerations.URole;
 import com.epam.rd.exceptions.UserExistException;
+import com.epam.rd.model.mapper.UserMapper;
 import com.epam.rd.payload.request.LoginRequest;
 import com.epam.rd.payload.request.SignupRequest;
 import com.epam.rd.payload.response.JWTTokenSuccessResponse;
@@ -11,7 +13,6 @@ import com.epam.rd.repository.UserRepository;
 import com.epam.rd.security.JWTTokenProvider;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,9 +35,11 @@ public class UserServiceImpl implements UserService {
     private final JWTTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
 
+    private final UserMapper userMapper;
+
     @Transactional
     @Override
-    public User createUser(SignupRequest signupRequest) {
+    public UserDto createUser(SignupRequest signupRequest) {
         User user = new User();
         user.setFirstName(signupRequest.getFirstName());
         user.setLastName(signupRequest.getLastName());
@@ -46,33 +49,37 @@ public class UserServiceImpl implements UserService {
         user.setAge(signupRequest.getAge());
         user.getRoles().add(URole.USER);
         user.setRole(URole.USER);
-        if (isUserExistByEmail(user.getEmail())) {
-            throw new UserExistException("The user with email " + user.getEmail() + " already exists. Please check credentials.");
+        if (isUserExistByEmail(signupRequest.getEmail())) {
+            throw new UserExistException("The user with email " + signupRequest.getEmail() + " already exists. Please check credentials.");
         }
-        return userRepository.save(user);
+        return userMapper.userToDto(userRepository.save(user));
     }
 
     @Transactional
     @Override
-    public User getUserByPrincipal(Principal principal) {
-        return userRepository.findByEmail(principal.getName())
+    public UserDto getUserByPrincipal(Principal principal) {
+        User user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST));
+        return userMapper.userToDto(user);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(userMapper::userToDtoWithoutPassword)
+                .toList();
     }
 
     @Transactional
     @Override
-    public User getCurrentUser() {
+    public UserDto getCurrentUser() {
         String email = getPrincipal();
         User currentUser = new User();
-        if (email != null)
+        if (email != null) {
             currentUser = userRepository.findByEmail(email).orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST));
-        return currentUser;
+        }
+        return userMapper.userToDto(currentUser);
     }
 
     private String getPrincipal() {
@@ -89,8 +96,9 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST));
+    public UserDto getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST));
+        return userMapper.userToDto(user);
     }
 
     @Transactional(readOnly = true)

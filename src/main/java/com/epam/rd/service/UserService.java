@@ -1,5 +1,6 @@
 package com.epam.rd.service;
 
+import com.epam.rd.model.dto.UserDto;
 import com.epam.rd.model.entity.User;
 import com.epam.rd.payload.request.LoginRequest;
 import com.epam.rd.payload.request.SignupRequest;
@@ -10,15 +11,15 @@ import java.util.List;
 
 public interface UserService {
 
-    User createUser(SignupRequest signupRequest);
+    UserDto createUser(SignupRequest signupRequest);
 
-    User getUserByPrincipal(Principal principal);
+    UserDto getUserByPrincipal(Principal principal);
 
-    List<User> getAllUsers();
+    List<UserDto> getAllUsers();
 
-    User getCurrentUser();
+    UserDto getCurrentUser();
 
-    User getUserByEmail(String email);
+    UserDto getUserByEmail(String email);
 
     boolean isUserExistByEmail(String email);
 

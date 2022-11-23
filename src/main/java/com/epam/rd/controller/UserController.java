@@ -1,6 +1,6 @@
 package com.epam.rd.controller;
 
-import com.epam.rd.model.entity.User;
+import com.epam.rd.model.dto.UserDto;
 import com.epam.rd.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<User> getAll() {
+    public List<UserDto> getAll() {
         return userService.getAllUsers();
     }
 

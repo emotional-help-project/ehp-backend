@@ -1,10 +1,8 @@
 package com.epam.rd.controller;
 
-import com.epam.rd.model.entity.User;
-import com.epam.rd.payload.response.JWTTokenSuccessResponse;
+import com.epam.rd.model.dto.UserDto;
 import com.epam.rd.payload.request.LoginRequest;
 import com.epam.rd.payload.request.SignupRequest;
-import com.epam.rd.security.JWTTokenProvider;
 import com.epam.rd.service.UserService;
 import com.epam.rd.validations.ResponseErrorValidation;
 import lombok.RequiredArgsConstructor;
@@ -50,12 +48,12 @@ public class AccountController {
         ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
         if (!ObjectUtils.isEmpty(errors)) return errors;
 
-        User user = userService.createUser(signupRequest);
+        UserDto user = userService.createUser(signupRequest);
         return ResponseEntity.ok(user);
     }
 
     @GetMapping
-    public ResponseEntity<User> getUserByPrincipal(Principal principal) {
+    public ResponseEntity<UserDto> getUserByPrincipal(Principal principal) {
         if (principal != null && principal.getName() != null) {
             return ResponseEntity.ok(userService.getUserByPrincipal(principal));
         }
