@@ -1,7 +1,6 @@
 package com.epam.rd.annotations;
 
 
-
 import com.epam.rd.validations.EmailValidator;
 
 import javax.validation.Constraint;
@@ -15,7 +14,7 @@ import java.lang.annotation.*;
 public @interface ValidEmail {
     String message() default "Invalid Email";
 
-    Class<?>[] groups() default{};
+    Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 

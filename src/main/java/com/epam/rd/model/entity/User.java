@@ -1,58 +1,78 @@
-package com.epam.rd.entity;
+package com.epam.rd.model.entity;
 
-import com.epam.rd.enumirations.URoles;
+import com.epam.rd.model.enumerations.Gender;
+import com.epam.rd.model.enumerations.URole;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
-@Entity(name = "app_user")
+@Entity(name = "users")
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    private String name;
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+
     @Column(nullable = false, unique = true)
-    private String username;
+    private String email;
+
     @Column(nullable = false)
     private String password;
+
     @Enumerated(EnumType.STRING)
-    private URoles uRoles;
-    @ElementCollection(targetClass = URoles.class)
+    private Gender gender;
+
+    @Min(value = 3)
+    private int age;
+
+    @Enumerated(EnumType.STRING)
+    private URole role;
+
+    @ElementCollection(targetClass = URole.class)
     @CollectionTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"))
-    private Set<URoles> roles = new HashSet<>();
+    private Set<URole> roles = new HashSet<>();
     @Transient
     private Collection<? extends GrantedAuthority> authorities;
 
-    public User() {}
-
     public User(Long id,
-                String username,
-                String name,
+                String firstName,
+                String lastName,
+                String email,
                 String password,
+                Gender gender,
+                int age,
                 Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
-        this.username = username;
-        this.name = name;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
         this.password = password;
+        this.gender = gender;
+        this.age = age;
         this.authorities = authorities;
     }
-/**
- * Security
 
- */
-
-
+    /**
+     * Security
+     */
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -72,6 +92,7 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
     @Override
     public String getPassword() {
         return password;
@@ -79,6 +100,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.username;
+        return email;
     }
+
 }

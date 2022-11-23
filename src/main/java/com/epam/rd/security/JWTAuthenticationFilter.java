@@ -1,7 +1,8 @@
 package com.epam.rd.security;
 
-import com.epam.rd.entity.User;
+import com.epam.rd.model.entity.User;
 import com.epam.rd.service.CustomUserDetailsService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Log4j2
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -35,7 +37,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception exception) {
+            log.error("Spring Security Filter Chain Exception:", exception);
+        }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
