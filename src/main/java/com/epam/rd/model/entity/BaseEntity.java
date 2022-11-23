@@ -2,6 +2,9 @@ package com.epam.rd.model.entity;
 
 import javax.persistence.*;
 
+/**
+ * Base entity created for avoid DRY.
+ */
 @MappedSuperclass
 public class BaseEntity {
     @Id

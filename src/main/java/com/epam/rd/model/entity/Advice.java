@@ -5,7 +5,11 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 
+/**
+ *
+ */
 @Getter
 @Setter
 @Entity
@@ -14,8 +18,9 @@ public class Advice extends BaseEntity{
     private int scoreFrom;
     @Column
     private int scoreTo;
-
+@ManyToOne
     private Test test;
+@ManyToOne
     private Link link;
 
 }
