@@ -9,17 +9,5 @@ import org.springframework.stereotype.Component;
 @Component
 public abstract class UserMapper implements EntityMapper<UserDto, User> {
 
-    abstract UserDto mapToDto(User user);
-
-    abstract User mapToUser(UserDto user);
-
-    public UserDto toDto(User user) {
-        return mapToDto(user);
-    }
-
-    public User toEntity(UserDto userDto) {
-        return mapToUser(userDto);
-    }
-
 }
 
