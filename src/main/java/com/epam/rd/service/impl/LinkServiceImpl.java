@@ -1,14 +1,13 @@
 package com.epam.rd.service.impl;
 
-import com.epam.rd.model.entity.Type;
+import com.epam.rd.model.entity.Link;
 import com.epam.rd.repository.BaseRepository;
 import org.springframework.stereotype.Service;
 
-
 @Service
-public class TypeServiceImpl extends BaseServiceImpl<Type, Long> {
+public class LinkServiceImpl extends BaseServiceImpl<Link,Long>{
 
-    public TypeServiceImpl(BaseRepository<Type> baseRepository) {
+    public LinkServiceImpl(BaseRepository<Link> baseRepository) {
         super(baseRepository);
     }
 }
