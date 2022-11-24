@@ -9,9 +9,11 @@ import javax.persistence.*;
 @Setter
 @Entity
 public class Question extends BaseEntity {
- @Column
+    @Column
     private Integer number;
- @ManyToOne
+    @ManyToOne
     private Test test;
+    @Column
+    private Boolean multiple_answers;
 
 }

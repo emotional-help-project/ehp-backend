@@ -14,5 +14,4 @@ public class Link extends BaseEntity{
     @Column
     private String link;
 
-
 }

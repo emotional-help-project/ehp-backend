@@ -7,13 +7,22 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Entity
-public class TypeLink {
+@Entity(name = "user_answers")
+public class UserAnswers {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
-    private TestType testType;
-    @ManyToOne
-    private Link link;
+    private User user;
+
+    @OneToOne
+    private Question question;
+
+    @OneToOne
+    private Answer answer;
+
+    @OneToOne
+    private Session session;
 }

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-
 public class QuestionServiceImpl extends BaseServiceImpl<Question,Long> {
 
     public QuestionServiceImpl(BaseRepository<Question> baseRepository) {

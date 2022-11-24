@@ -20,7 +20,7 @@ public class TestResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column
-    private float result;
+    private Float result;
     @JsonFormat(pattern = "yyyy-MM-dd  HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd  HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -29,7 +29,7 @@ public class TestResult {
 
     @ManyToOne
     private User user;
-    @ManyToOne
-    private Question question;
+    @OneToOne
+    private Advice advice;
 
 }

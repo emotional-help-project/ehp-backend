@@ -1,9 +1,7 @@
 package com.epam.rd.service;
 
-import com.epam.rd.model.entity.Type;
+import com.epam.rd.model.entity.TestType;
 
-import java.util.Optional;
-
-public interface TypeService extends CommonService<Type,Long>{
+public interface TypeService extends CommonService<TestType,Long>{
 
 }

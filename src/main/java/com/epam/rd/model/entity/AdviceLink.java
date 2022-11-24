@@ -7,13 +7,15 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Entity
-public class TypeLink {
+@Entity(name = "advice_links")
+public class AdviceLink {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
-    private TestType testType;
+    private Advice advice;
     @ManyToOne
     private Link link;
 }

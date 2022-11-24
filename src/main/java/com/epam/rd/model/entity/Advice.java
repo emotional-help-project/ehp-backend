@@ -7,20 +7,17 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
-/**
- *
- */
+
 @Getter
 @Setter
 @Entity
-public class Advice extends BaseEntity{
-    @Column
+public class Advice extends BaseEntity {
+
+    @Column(name = "score_from")
     private int scoreFrom;
-    @Column
+    @Column(name = "score_to")
     private int scoreTo;
-@ManyToOne
+    @ManyToOne
     private Test test;
-@ManyToOne
-    private Link link;
 
 }
