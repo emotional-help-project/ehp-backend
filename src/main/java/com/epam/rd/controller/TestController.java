@@ -37,16 +37,24 @@ public class TestController extends BaseController<Test> {
     @PostMapping("/test/session/{sessionId}")
     public ResponseEntity<?> submitUserAnswers(@RequestBody UserAnswersRequest userAnswersRequest,
                                                @PathVariable Long sessionId) {
-        testService.submitUserAnswers(userAnswersRequest, sessionId);
-
+        try {
+            testService.submitUserAnswers(userAnswersRequest, sessionId);
+        } catch (TestProcessingException exception) {
+            return ResponseEntity.badRequest()
+                    .body(new TestProcessingException("Answers can not be submitted."));
+        }
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/test/session/{sessionId}/finalize")
     public ResponseEntity<?> finalizeTest(@RequestBody UserAnswersRequest userAnswersRequest,
                                           @PathVariable Long sessionId) {
-        testService.submitUserAnswers(userAnswersRequest, sessionId);
-
+        try {
+            testService.submitUserAnswers(userAnswersRequest, sessionId);
+        } catch (TestProcessingException exception) {
+            return ResponseEntity.badRequest()
+                    .body(new TestProcessingException("Answers can not be submitted."));
+        }
         FinalizeTestResponse finalizeTestResponse = testService.finalizeTest(sessionId);
         if (finalizeTestResponse == null) {
             return ResponseEntity.badRequest()
