@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Entity
+@Entity(name = "questions")
 public class Question extends BaseEntity {
     @Column
     private Integer number;

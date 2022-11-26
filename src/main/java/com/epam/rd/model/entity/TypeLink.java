@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Entity
+@Entity(name = "type_links")
 public class TypeLink {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

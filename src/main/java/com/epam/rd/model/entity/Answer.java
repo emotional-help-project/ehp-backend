@@ -7,8 +7,8 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Entity
-public class Answer extends BaseEntity{
+@Entity(name = "answers")
+public class Answer extends BaseEntity {
     @ManyToOne
     private Question question;
 

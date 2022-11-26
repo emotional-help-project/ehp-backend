@@ -1,43 +1,32 @@
-package com.epam.rd.model.entity;
+package com.epam.rd.model.dto;
 
+import com.epam.rd.model.entity.Advice;
+import com.epam.rd.model.entity.Session;
+import com.epam.rd.model.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.Data;
+import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@Entity(name = "test_results")
-@EntityListeners(AuditingEntityListener.class)
-public class TestResult {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column
-    private Long result;
+@Data
+@Accessors(chain = true)
+public class TestResultDto {
 
-    @CreatedDate
-    @Column(name = "date_time", nullable = false, updatable = false)
+    private Long id;
+    private Long result;
     @JsonFormat(pattern = "yyyy-MM-dd  HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd  HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime dateTime;
 
-    @ManyToOne
     private User user;
-    @OneToOne
     private Advice advice;
-    @OneToOne
     private Session session;
-
 }

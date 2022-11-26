@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Entity
+@Entity(name = "test_types")
 public class TestType extends BaseEntity {
 
 

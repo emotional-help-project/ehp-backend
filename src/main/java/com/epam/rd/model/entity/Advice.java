@@ -14,9 +14,9 @@ import javax.persistence.ManyToOne;
 public class Advice extends BaseEntity {
 
     @Column(name = "score_from")
-    private int scoreFrom;
+    private Long scoreFrom;
     @Column(name = "score_to")
-    private int scoreTo;
+    private Long scoreTo;
     @ManyToOne
     private Test test;
 
