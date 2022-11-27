@@ -21,11 +21,12 @@ public class TestController extends BaseController<Test> {
         this.testService = testService;
     }
 
-    @GetMapping("/test/{id}")
-    public ResponseEntity<?> getTest(@PathVariable Long id,
+    @GetMapping("/test/{testId}/session/{sessionId}")
+    public ResponseEntity<?> getTest(@PathVariable Long testId,
+                                     @PathVariable Long sessionId,
                                      @RequestParam(defaultValue = "0") int skip,
                                      @RequestParam(defaultValue = "10") int take) {
-        return ResponseEntity.ok(testService.getTestQuestionsPaginated(id, skip, take));
+        return ResponseEntity.ok(testService.getTestQuestionsPaginated(testId, sessionId, skip, take));
     }
 
     @PostMapping("/test/{id}/init")

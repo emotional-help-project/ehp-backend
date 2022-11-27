@@ -5,13 +5,15 @@ import com.epam.rd.model.dto.TestResultDto;
 import com.epam.rd.model.dto.UserAnswersDto;
 import com.epam.rd.model.entity.*;
 import com.epam.rd.model.mapper.TestResultMapper;
+import com.epam.rd.payload.response.AnswerResponse;
 import com.epam.rd.payload.response.FinalizeTestResponse;
 import com.epam.rd.payload.request.UserAnswersRequest;
 import com.epam.rd.model.mapper.UserAnswersMapper;
+import com.epam.rd.payload.response.QuestionAnswersResponse;
+import com.epam.rd.payload.response.TestQuestionsResponse;
 import com.epam.rd.repository.*;
 
 import com.epam.rd.service.TestService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -64,10 +66,32 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
 
     @Transactional
     @Override
-    public Page<Question> getTestQuestionsPaginated(Long testId, int skip, int take) {
-        Test test = testRepository.findById(testId).orElseThrow(() -> new TestProcessingException(CANNOT_FIND_TEST + testId));
+    public TestQuestionsResponse getTestQuestionsPaginated(Long testId, Long sessionId, int skip, int take) {
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new TestProcessingException(CANNOT_FIND_TEST + testId));
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new SessionProcessingException(CANNOT_FIND_SESSION + sessionId));
+        List<UserAnswersDto> userAnswersDtoList = userAnswersRepository.findUserAnswersBySession(session)
+                .stream().map(userAnswersMapper::toDto).toList();
+
         Pageable pageable = createPageRequest(skip, take);
-        return questionRepository.findTestQuestionsPaginated(test, pageable);
+        List<Question> questionsPaginated = questionRepository.findTestQuestionsPaginated(test, pageable).getContent();
+
+        List<QuestionAnswersResponse> items = new ArrayList<>();
+        questionsPaginated.forEach(q -> items.add(new QuestionAnswersResponse()
+                .setQuestionId(q.getId())
+                .setQuestionText(q.getTitle())
+                .setAnswers(answerRepository.findByQuestion(q).stream()
+                        .map(a -> new AnswerResponse().setAnswerId(a.getId())
+                                .setAnswerText(a.getTitle())
+                                .setChecked(userAnswersDtoList.stream()
+                                        .map(UserAnswersDto::getQuestion)
+                                        .anyMatch(uaq -> uaq.equals(a.getQuestion()))))
+                        .toList())));
+
+        Long totalNumberOfTestQuestions = questionRepository.countByTest(test);
+        return new TestQuestionsResponse().setTotalNumberOfTestQuestions(totalNumberOfTestQuestions)
+                .setItems(items);
     }
 
     @Transactional
@@ -93,7 +117,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
 
         List<UserAnswersDto> userAnswersDtoListToBeSaved = new ArrayList<>();
 
-        userAnswersRequest.getQuestionAnswerRequests()
+        userAnswersRequest.getQuestionAnswerUserRequests()
                 .forEach(qa -> qa.getAnswerIds()
                         .forEach(answerId -> userAnswersDtoListToBeSaved.add(
                                 new UserAnswersDto()

@@ -14,4 +14,6 @@ public interface QuestionRepository extends BaseRepository<Question> {
     @Query("SELECT q FROM questions q WHERE q.test = :test")
     Page<Question> findTestQuestionsPaginated(@Param(value = "test") Test test, Pageable pageable);
 
+    Long countByTest(@Param(value = "test") Test test);
+
 }

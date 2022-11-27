@@ -9,5 +9,5 @@ public class UserAnswersRequest {
 
     private Long userId;
     private Long testId;
-    private List<QuestionAnswerRequest> questionAnswerRequests;
+    private List<QuestionAnswerUserRequest> questionAnswerUserRequests;
 }
