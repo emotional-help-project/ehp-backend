@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface QuestionRepository extends BaseRepository<Question> {
 
@@ -16,4 +18,7 @@ public interface QuestionRepository extends BaseRepository<Question> {
 
     Long countByTest(@Param(value = "test") Test test);
 
+    @Query("SELECT q FROM questions q WHERE q.id in :questionIds AND q.multiple_answers = :multipleAnswers")
+    List<Question> findByQuestionIdsAndMultipleAnswers(@Param("questionIds") List<Long> questionIds,
+                                                       @Param("multipleAnswers") Boolean multipleAnswers);
 }

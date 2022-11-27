@@ -5,6 +5,7 @@ import com.epam.rd.model.dto.TestResultDto;
 import com.epam.rd.model.dto.UserAnswersDto;
 import com.epam.rd.model.entity.*;
 import com.epam.rd.model.mapper.TestResultMapper;
+import com.epam.rd.payload.request.QuestionAnswerUserRequest;
 import com.epam.rd.payload.response.AnswerResponse;
 import com.epam.rd.payload.response.FinalizeTestResponse;
 import com.epam.rd.payload.request.UserAnswersRequest;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -32,6 +34,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
     private static final String CANNOT_FIND_QUESTION = "Cannot find question with ID=";
     private static final String CANNOT_FIND_ANSWER = "Cannot find answer with ID=";
     private static final String CANNOT_FIND_ADVICE_FOR_USER_SCORE = "Cannot find advice for user's score=";
+    private static final String ONLY_ONE_ANSWER_FOR_QUESTION = "Only one answer can be submitted for question with ID=";
     private final TestRepository testRepository;
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
@@ -109,6 +112,19 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
     @Transactional
     @Override
     public void submitUserAnswers(UserAnswersRequest userAnswersRequest, Long sessionId) {
+
+        List<Long> questionIdsFromUserAnswersRequest = userAnswersRequest.getQuestionAnswerUserRequests()
+                .stream().map(QuestionAnswerUserRequest::getQuestionId).toList();
+        List<Question> questionsFromRequestWithOnePossibleAnswer =
+                questionRepository.findByQuestionIdsAndMultipleAnswers(questionIdsFromUserAnswersRequest, false);
+
+        userAnswersRequest.getQuestionAnswerUserRequests().forEach(qau -> {
+            if (qau.getAnswerIds().size() > 1 &&
+                    questionsFromRequestWithOnePossibleAnswer.stream().map(Question::getId)
+                            .anyMatch(id -> Objects.equals(id, qau.getQuestionId()))) {
+                throw new TestProcessingException(ONLY_ONE_ANSWER_FOR_QUESTION + qau.getQuestionId());
+            }
+        });
 
         User user = userRepository.findById(userAnswersRequest.getUserId())
                 .orElseThrow(() -> new UserProcessingException(CANNOT_FIND_USER + userAnswersRequest.getUserId()));
