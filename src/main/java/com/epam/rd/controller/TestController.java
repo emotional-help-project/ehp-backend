@@ -64,5 +64,11 @@ public class TestController extends BaseController<Test> {
         return ResponseEntity.ok(finalizeTestResponse);
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getTestPageForUser(@PathVariable Long id,
+                                                @RequestParam(defaultValue = "0") int skip,
+                                                @RequestParam(defaultValue = "10") int take) {
+        return ResponseEntity.ok(testService.getAllTestsForUser(id, skip, take));
+    }
 
 }

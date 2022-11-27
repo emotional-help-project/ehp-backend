@@ -4,6 +4,7 @@ import com.epam.rd.model.entity.Answer;
 import com.epam.rd.payload.response.FinalizeTestResponse;
 import com.epam.rd.payload.request.UserAnswersRequest;
 import com.epam.rd.model.entity.Test;
+import com.epam.rd.payload.response.TestPageForUserResponse;
 import com.epam.rd.payload.response.TestQuestionsResponse;
 
 import java.util.List;
@@ -26,4 +27,7 @@ public interface TestService extends CommonService<Test, Long> {
     FinalizeTestResponse finalizeTest(Long sessionId);
 
     long calculateUserScore(List<Answer> answers);
+
+    TestPageForUserResponse getAllTestsForUser(Long userId, int skip, int take);
+
 }

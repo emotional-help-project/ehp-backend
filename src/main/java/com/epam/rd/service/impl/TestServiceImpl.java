@@ -6,12 +6,9 @@ import com.epam.rd.model.dto.UserAnswersDto;
 import com.epam.rd.model.entity.*;
 import com.epam.rd.model.mapper.TestResultMapper;
 import com.epam.rd.payload.request.QuestionAnswerUserRequest;
-import com.epam.rd.payload.response.AnswerResponse;
-import com.epam.rd.payload.response.FinalizeTestResponse;
+import com.epam.rd.payload.response.*;
 import com.epam.rd.payload.request.UserAnswersRequest;
 import com.epam.rd.model.mapper.UserAnswersMapper;
-import com.epam.rd.payload.response.QuestionAnswersResponse;
-import com.epam.rd.payload.response.TestQuestionsResponse;
 import com.epam.rd.repository.*;
 
 import com.epam.rd.service.TestService;
@@ -21,9 +18,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -77,7 +74,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         List<UserAnswersDto> userAnswersDtoList = userAnswersRepository.findUserAnswersBySession(session)
                 .stream().map(userAnswersMapper::toDto).toList();
 
-        Pageable pageable = createPageRequest(skip, take);
+        Pageable pageable = createPageRequest(skip, take, "number");
         List<Question> questionsPaginated = questionRepository.findTestQuestionsPaginated(test, pageable).getContent();
 
         List<QuestionAnswersResponse> items = new ArrayList<>();
@@ -163,7 +160,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         List<Question> allQuestionsOfTest = questionRepository.findAllByTest(test);
 
         for (Question question : allQuestionsOfTest) {
-            if(userFinalAnswersForTest.stream().map(Answer::getQuestion)
+            if (userFinalAnswersForTest.stream().map(Answer::getQuestion)
                     .noneMatch(userQuestion -> userQuestion.equals(question))) {
                 return null;
             }
@@ -180,6 +177,9 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                 .setUser(session.getUser())
                 .setSession(session);
         testResultRepository.save(testResultMapper.toEntity(testResult));
+
+        session.setIsFinished(true);
+        sessionRepository.save(session);
 
         return new FinalizeTestResponse()
                 .setAdviceDescription(advice.getTitle())
@@ -206,8 +206,27 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                 .sum();
     }
 
-    private PageRequest createPageRequest(int skip, int take) {
-        return PageRequest.of(skip, take, Sort.by("number").ascending());
+    @Transactional
+    @Override
+    public TestPageForUserResponse getAllTestsForUser(Long userId, int skip, int take) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserProcessingException(CANNOT_FIND_USER + userId));
+        List<Session> incompleteSessionsByUser = sessionRepository.findAllByUserAndFinished(user, false);
+
+        Map<Test, Session> incompleteSessionForEachTest = incompleteSessionsByUser.stream()
+                .collect(Collectors.toMap(Session::getTest, Function.identity()));
+
+        List<IncompleteTestResponse> incompleteTestResponses = incompleteSessionForEachTest
+                .entrySet().stream().map(
+                        entry -> new IncompleteTestResponse()
+                                .setTestId(entry.getKey().getId())
+                                .setSessionId(entry.getValue().getId())).toList();
+        return new TestPageForUserResponse().setIncompleteTests(incompleteTestResponses)
+                .setTests(testRepository.findAllTestsPaginated(createPageRequest(skip, take, "testType")));
+    }
+
+    private PageRequest createPageRequest(int skip, int take, String... sortBy) {
+        return PageRequest.of(skip, take, Sort.by(sortBy).ascending());
     }
 
 }
