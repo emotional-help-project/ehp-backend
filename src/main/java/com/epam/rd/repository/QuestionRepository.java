@@ -21,4 +21,6 @@ public interface QuestionRepository extends BaseRepository<Question> {
     @Query("SELECT q FROM questions q WHERE q.id in :questionIds AND q.multiple_answers = :multipleAnswers")
     List<Question> findByQuestionIdsAndMultipleAnswers(@Param("questionIds") List<Long> questionIds,
                                                        @Param("multipleAnswers") Boolean multipleAnswers);
+
+    List<Question> findAllByTest(@Param(value = "test") Test test);
 }

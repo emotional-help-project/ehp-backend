@@ -156,6 +156,19 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new SessionProcessingException(CANNOT_FIND_SESSION + sessionId));
         List<Answer> userFinalAnswersForTest = getUsersAllAnswersForTestBySession(session);
+
+        Long testId = session.getTest().getId();
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new TestProcessingException(CANNOT_FIND_TEST + testId));
+        List<Question> allQuestionsOfTest = questionRepository.findAllByTest(test);
+
+        for (Question question : allQuestionsOfTest) {
+            if(userFinalAnswersForTest.stream().map(Answer::getQuestion)
+                    .noneMatch(userQuestion -> userQuestion.equals(question))) {
+                return null;
+            }
+        }
+
         long userScore = calculateUserScore(userFinalAnswersForTest);
         Advice advice = adviceRepository.findAdviceByUserScore(userScore)
                 .orElseThrow(() -> new AdviceProcessingException(CANNOT_FIND_ADVICE_FOR_USER_SCORE + userScore));
@@ -185,6 +198,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                 .map(UserAnswersDto::getAnswer).toList();
     }
 
+    @Transactional
     @Override
     public long calculateUserScore(List<Answer> answers) {
         return answers.stream()
