@@ -1,7 +1,7 @@
 package com.epam.rd.controller;
 
 import com.epam.rd.model.dto.UserDto;
-import com.epam.rd.model.enumerations.Gender;
+import com.epam.rd.payload.request.SearchRequest;
 import com.epam.rd.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -52,12 +52,9 @@ public class UserController {
         return userService.getAllUsersPaginated(pageNum, pageSize);
     }
 
-    @GetMapping("/page/{gender}")
-    public Page<UserDto> getAllUsersByGenderPaginated(@PathVariable String gender,
-                                                      @RequestParam(required = false, defaultValue = "1") int pageNum,
-                                                      @RequestParam(required = false, defaultValue = "5") int pageSize) {
-
-        return userService.getAllUsersByGenderPaginated(Gender.fromString(gender), pageNum, pageSize);
+    @PostMapping(value = "/search")
+    public Page<UserDto> search(@RequestBody SearchRequest request) {
+        return userService.searchUser(request);
     }
 
 }

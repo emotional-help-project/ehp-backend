@@ -3,11 +3,12 @@ package com.epam.rd.service.impl;
 import com.epam.rd.exceptions.UserProcessingException;
 import com.epam.rd.model.dto.UserDto;
 import com.epam.rd.model.entity.User;
-import com.epam.rd.model.enumerations.Gender;
 import com.epam.rd.model.enumerations.URole;
 import com.epam.rd.exceptions.UserExistException;
 import com.epam.rd.model.mapper.UserMapper;
+import com.epam.rd.model.search.SearchSpecification;
 import com.epam.rd.payload.request.LoginRequest;
+import com.epam.rd.payload.request.SearchRequest;
 import com.epam.rd.payload.request.SignupRequest;
 import com.epam.rd.payload.response.JWTTokenSuccessResponse;
 import com.epam.rd.repository.UserRepository;
@@ -46,7 +47,6 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JWTTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
-
     private final UserMapper userMapper;
 
     @Transactional
@@ -167,14 +167,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserDto> getAllUsersPaginated(int pageNum, int pageSize) {
         Pageable pageable = createPageRequest(pageNum, pageSize);
-        return userRepository.findAllPaginated(pageable).map(userMapper::toDto);
+        return userRepository.findAll(pageable).map(userMapper::toDto);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     @Override
-    public Page<UserDto> getAllUsersByGenderPaginated(Gender gender, int pageNum, int pageSize) {
-        Pageable pageable = createPageRequest(pageNum, pageSize);
-        return userRepository.findAllByGenderPaginated(gender, pageable).map(userMapper::toDto);
+    public Page<UserDto> searchUser(SearchRequest request) {
+        SearchSpecification<User> specification = new SearchSpecification<>(request);
+        Pageable pageable = SearchSpecification.getPageable(request.getPage(), request.getSize());
+        return userRepository.findAll(specification, pageable).map(userMapper::toDto);
     }
 
     private PageRequest createPageRequest(int pageNum, int pageSize) {
