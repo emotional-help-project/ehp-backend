@@ -1,17 +1,16 @@
 package com.epam.rd.service.impl;
 
 import com.epam.rd.exceptions.*;
-import com.epam.rd.model.dto.TestResultDto;
-import com.epam.rd.model.dto.UserAnswersDto;
+import com.epam.rd.model.dto.*;
 import com.epam.rd.model.entity.*;
-import com.epam.rd.model.mapper.TestResultMapper;
+import com.epam.rd.model.mapper.*;
 import com.epam.rd.payload.request.QuestionAnswerUserRequest;
 import com.epam.rd.payload.response.*;
 import com.epam.rd.payload.request.UserAnswersRequest;
-import com.epam.rd.model.mapper.UserAnswersMapper;
 import com.epam.rd.repository.*;
 
 import com.epam.rd.service.TestService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -43,13 +42,19 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
     private final TestResultRepository testResultRepository;
     private final UserAnswersMapper userAnswersMapper;
     private final TestResultMapper testResultMapper;
-
+    private final QuestionMapper questionMapper;
+    private final AnswerMapper answerMapper;
+    private final SessionMapper sessionMapper;
+    private final TestMapper testMapper;
+    private final LinkMapper linkMapper;
     public TestServiceImpl(BaseRepository<Test> baseRepository, TestRepository testRepository,
                            SessionRepository sessionRepository, UserRepository userRepository,
                            UserAnswersRepository userAnswersRepository, QuestionRepository questionRepository,
                            AnswerRepository answerRepository, AdviceRepository adviceRepository,
                            LinkRepository linkRepository, TestResultRepository testResultRepository,
-                           UserAnswersMapper userAnswersMapper, TestResultMapper testResultMapper) {
+                           UserAnswersMapper userAnswersMapper, TestResultMapper testResultMapper,
+                           QuestionMapper questionMapper, AnswerMapper answerMapper,
+                           SessionMapper sessionMapper, TestMapper testMapper, LinkMapper linkMapper) {
         super(baseRepository);
         this.testRepository = testRepository;
         this.sessionRepository = sessionRepository;
@@ -62,6 +67,11 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         this.testResultRepository = testResultRepository;
         this.userAnswersMapper = userAnswersMapper;
         this.testResultMapper = testResultMapper;
+        this.questionMapper = questionMapper;
+        this.answerMapper = answerMapper;
+        this.sessionMapper = sessionMapper;
+        this.testMapper = testMapper;
+        this.linkMapper = linkMapper;
     }
 
     @Transactional
@@ -75,13 +85,14 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                 .stream().map(userAnswersMapper::toDto).toList();
 
         Pageable pageable = createPageRequest(skip, take, "number");
-        List<Question> questionsPaginated = questionRepository.findTestQuestionsPaginated(test, pageable).getContent();
+        List<QuestionDto> questionsPaginated = questionRepository.findTestQuestionsPaginated(test, pageable).getContent()
+                .stream().map(questionMapper::toDto).toList();
 
         List<QuestionAnswersResponse> items = new ArrayList<>();
         questionsPaginated.forEach(q -> items.add(new QuestionAnswersResponse()
                 .setQuestionId(q.getId())
                 .setQuestionText(q.getTitle())
-                .setAnswers(answerRepository.findByQuestion(q).stream()
+                .setAnswers(answerRepository.findByQuestion(questionMapper.toEntity(q)).stream()
                         .map(a -> new AnswerResponse().setAnswerId(a.getId())
                                 .setAnswerText(a.getTitle())
                                 .setChecked(userAnswersDtoList.stream()
@@ -112,12 +123,13 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
 
         List<Long> questionIdsFromUserAnswersRequest = userAnswersRequest.getQuestionAnswerUserRequests()
                 .stream().map(QuestionAnswerUserRequest::getQuestionId).toList();
-        List<Question> questionsFromRequestWithOnePossibleAnswer =
-                questionRepository.findByQuestionIdsAndMultipleAnswers(questionIdsFromUserAnswersRequest, false);
+        List<QuestionDto> questionsFromRequestWithOnePossibleAnswer =
+                questionRepository.findByQuestionIdsAndMultipleAnswers(questionIdsFromUserAnswersRequest, false)
+                        .stream().map(questionMapper::toDto).toList();
 
         userAnswersRequest.getQuestionAnswerUserRequests().forEach(qau -> {
             if (qau.getAnswerIds().size() > 1 &&
-                    questionsFromRequestWithOnePossibleAnswer.stream().map(Question::getId)
+                    questionsFromRequestWithOnePossibleAnswer.stream().map(QuestionDto::getId)
                             .anyMatch(id -> Objects.equals(id, qau.getQuestionId()))) {
                 throw new TestProcessingException(ONLY_ONE_ANSWER_FOR_QUESTION + qau.getQuestionId());
             }
@@ -152,15 +164,16 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
     public FinalizeTestResponse finalizeTest(Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new SessionProcessingException(CANNOT_FIND_SESSION + sessionId));
-        List<Answer> userFinalAnswersForTest = getUsersAllAnswersForTestBySession(session);
+        SessionDto sessionDto = sessionMapper.toDto(session);
+        List<AnswerDto> userFinalAnswersForTest = getUsersAllAnswersForTestBySession(sessionDto);
 
-        Long testId = session.getTest().getId();
+        Long testId = sessionDto.getTest().getId();
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new TestProcessingException(CANNOT_FIND_TEST + testId));
         List<Question> allQuestionsOfTest = questionRepository.findAllByTest(test);
 
         for (Question question : allQuestionsOfTest) {
-            if (userFinalAnswersForTest.stream().map(Answer::getQuestion)
+            if (userFinalAnswersForTest.stream().map(AnswerDto::getQuestion)
                     .noneMatch(userQuestion -> userQuestion.equals(question))) {
                 return null;
             }
@@ -169,7 +182,8 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         long userScore = calculateUserScore(userFinalAnswersForTest);
         Advice advice = adviceRepository.findAdviceByUserScore(userScore)
                 .orElseThrow(() -> new AdviceProcessingException(CANNOT_FIND_ADVICE_FOR_USER_SCORE + userScore));
-        List<Link> usefulLinks = linkRepository.getLinksForAdvice(advice);
+        List<LinkDto> usefulLinks = linkRepository.getLinksForAdvice(advice)
+                .stream().map(linkMapper::toDto).toList();
 
         TestResultDto testResult = new TestResultDto()
                 .setResult(userScore)
@@ -189,20 +203,20 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                 .setLinks(usefulLinks);
     }
 
-    private List<Answer> getUsersAllAnswersForTestBySession(Session session) {
+    private List<AnswerDto> getUsersAllAnswersForTestBySession(SessionDto session) {
 
         List<UserAnswersDto> userAnswersDtoList =
-                userAnswersRepository.findUserAnswersBySession(session)
+                userAnswersRepository.findUserAnswersBySession(sessionMapper.toEntity(session))
                         .stream().map(userAnswersMapper::toDto).toList();
         return userAnswersDtoList.stream()
-                .map(UserAnswersDto::getAnswer).toList();
+                .map(UserAnswersDto::getAnswer).map(answerMapper::toDto).toList();
     }
 
     @Transactional
     @Override
-    public long calculateUserScore(List<Answer> answers) {
+    public long calculateUserScore(List<AnswerDto> answers) {
         return answers.stream()
-                .mapToLong(Answer::getScore)
+                .mapToLong(AnswerDto::getScore)
                 .sum();
     }
 
@@ -211,18 +225,23 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
     public TestPageForUserResponse getAllTestsForUser(Long userId, int skip, int take) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserProcessingException(CANNOT_FIND_USER + userId));
-        List<Session> incompleteSessionsByUser = sessionRepository.findAllByUserAndFinished(user, false);
+        List<SessionDto> incompleteSessionsByUser = sessionRepository.findAllByUserAndFinished(user, false)
+                .stream().map(sessionMapper::toDto).toList();
 
-        Map<Test, Session> incompleteSessionForEachTest = incompleteSessionsByUser.stream()
-                .collect(Collectors.toMap(Session::getTest, Function.identity()));
+        Map<Test, SessionDto> incompleteSessionForEachTest = incompleteSessionsByUser.stream()
+                .collect(Collectors.toMap(SessionDto::getTest, Function.identity()));
 
         List<IncompleteTestResponse> incompleteTestResponses = incompleteSessionForEachTest
                 .entrySet().stream().map(
                         entry -> new IncompleteTestResponse()
                                 .setTestId(entry.getKey().getId())
                                 .setSessionId(entry.getValue().getId())).toList();
+
+        Page<TestDto> allTests = testRepository.findAllTestsPaginated(createPageRequest(skip, take, "testType"))
+                .map(testMapper::toDto);
+
         return new TestPageForUserResponse().setIncompleteTests(incompleteTestResponses)
-                .setTests(testRepository.findAllTestsPaginated(createPageRequest(skip, take, "testType")));
+                .setTests(allTests);
     }
 
     private PageRequest createPageRequest(int skip, int take, String... sortBy) {

@@ -1,6 +1,6 @@
 package com.epam.rd.payload.response;
 
-import com.epam.rd.model.entity.Link;
+import com.epam.rd.model.dto.LinkDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -14,5 +14,5 @@ public class FinalizeTestResponse {
     private long scoreFrom;
     private long scoreTo;
     private long userScore;
-    private List<Link> links;
+    private List<LinkDto> links;
 }

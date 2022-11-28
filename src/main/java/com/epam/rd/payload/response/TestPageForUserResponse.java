@@ -1,5 +1,6 @@
 package com.epam.rd.payload.response;
 
+import com.epam.rd.model.dto.TestDto;
 import com.epam.rd.model.entity.Test;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -12,5 +13,5 @@ import java.util.List;
 public class TestPageForUserResponse {
 
     private List<IncompleteTestResponse> incompleteTests;
-    private Page<Test> tests;
+    private Page<TestDto> tests;
 }

@@ -1,5 +1,6 @@
 package com.epam.rd.service;
 
+import com.epam.rd.model.dto.AnswerDto;
 import com.epam.rd.model.entity.Answer;
 import com.epam.rd.payload.response.FinalizeTestResponse;
 import com.epam.rd.payload.request.UserAnswersRequest;
@@ -26,7 +27,7 @@ public interface TestService extends CommonService<Test, Long> {
 
     FinalizeTestResponse finalizeTest(Long sessionId);
 
-    long calculateUserScore(List<Answer> answers);
+    long calculateUserScore(List<AnswerDto> answers);
 
     TestPageForUserResponse getAllTestsForUser(Long userId, int skip, int take);
 
