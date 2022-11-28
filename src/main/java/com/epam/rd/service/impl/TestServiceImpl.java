@@ -112,7 +112,8 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         Test test = testRepository.findById(testId).orElseThrow(() -> new TestProcessingException(CANNOT_FIND_TEST + testId));
         Session newTestSession = new Session()
                 .setUser(user)
-                .setTest(test);
+                .setTest(test)
+                .setIsFinished(false);
         Session session = sessionRepository.save(newTestSession);
         return session.getId();
     }
