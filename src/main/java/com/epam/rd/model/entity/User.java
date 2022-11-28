@@ -2,10 +2,7 @@ package com.epam.rd.model.entity;
 
 import com.epam.rd.model.enumerations.Gender;
 import com.epam.rd.model.enumerations.URole;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,11 +12,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
 @Entity(name = "users")
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Data
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

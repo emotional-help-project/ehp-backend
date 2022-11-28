@@ -1,4 +1,4 @@
-package com.epam.rd.service;
+package com.epam.rd.service.impl;
 
 import com.epam.rd.exceptions.UserProcessingException;
 import com.epam.rd.model.dto.UserDto;
@@ -12,6 +12,7 @@ import com.epam.rd.payload.request.SignupRequest;
 import com.epam.rd.payload.response.JWTTokenSuccessResponse;
 import com.epam.rd.repository.UserRepository;
 import com.epam.rd.security.JWTTokenProvider;
+import com.epam.rd.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.log4j.Log4j2;
