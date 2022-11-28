@@ -124,16 +124,11 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
     @Override
     public void submitUserAnswers(UserAnswersRequest userAnswersRequest, Long sessionId) {
 
-        List<Long> questionIdsFromUserAnswersRequest = userAnswersRequest.getQuestionAnswerUserRequests()
-                .stream().map(QuestionAnswerUserRequest::getQuestionId).toList();
         List<QuestionDto> questionsFromRequestWithOnePossibleAnswer =
-                questionRepository.findByQuestionIdsAndMultipleAnswers(questionIdsFromUserAnswersRequest, false)
-                        .stream().map(questionMapper::toDto).toList();
+                getQuestionsFromRequestWithOnePossibleAnswer(userAnswersRequest);
 
         userAnswersRequest.getQuestionAnswerUserRequests().forEach(qau -> {
-            if (qau.getAnswerIds().size() > 1 &&
-                    questionsFromRequestWithOnePossibleAnswer.stream().map(QuestionDto::getId)
-                            .anyMatch(id -> Objects.equals(id, qau.getQuestionId()))) {
+            if (checkIfThereAreMultipleAnswersForQuestionWithOneAnswer(qau, questionsFromRequestWithOnePossibleAnswer)) {
                 throw new TestProcessingException(ONLY_ONE_ANSWER_FOR_QUESTION + qau.getQuestionId());
             }
         });
@@ -143,13 +138,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new SessionProcessingException(CANNOT_FIND_SESSION + sessionId));
 
-        List<Long> answerIdsInRequest = new ArrayList<>();
-        userAnswersRequest.getQuestionAnswerUserRequests().forEach(
-                qa -> answerIdsInRequest.addAll(qa.getAnswerIds()));
-        List<Answer> answers = answerRepository.findAllById(answerIdsInRequest);
-        List<UserAnswersDto> savedUserAnswersBySessionAndAnswers = userAnswersRepository.findUserAnswersBySessionAndAnswers(session, answers)
-                .stream().map(userAnswersMapper::toDto).toList();
-        if (savedUserAnswersBySessionAndAnswers.size() > 0) {
+        if (checkIfAnswersForQuestionAlreadySubmitted(userAnswersRequest, session)) {
             throw new TestProcessingException(ANSWER_FOR_QUESTION_ALREADY_EXISTS);
         }
 
@@ -181,17 +170,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         SessionDto sessionDto = sessionMapper.toDto(session);
         List<AnswerDto> userFinalAnswersForTest = getUsersAllAnswersForTestBySession(sessionDto);
 
-        Long testId = sessionDto.getTest().getId();
-        Test test = testRepository.findById(testId)
-                .orElseThrow(() -> new TestProcessingException(CANNOT_FIND_TEST + testId));
-        List<Question> allQuestionsOfTest = questionRepository.findAllByTest(test);
-
-        for (Question question : allQuestionsOfTest) {
-            if (userFinalAnswersForTest.stream().map(AnswerDto::getQuestion)
-                    .noneMatch(userQuestion -> userQuestion.equals(question))) {
-                return null;
-            }
-        }
+        if (!checkIfAllQuestionsAreAnswered(sessionDto, userFinalAnswersForTest)) return null;
 
         long userScore = calculateUserScore(userFinalAnswersForTest);
         Advice advice = adviceRepository.findAdviceByUserScore(userScore)
@@ -199,15 +178,9 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         List<LinkDto> usefulLinks = linkRepository.getLinksForAdvice(advice)
                 .stream().map(linkMapper::toDto).toList();
 
-        TestResultDto testResult = new TestResultDto()
-                .setResult(userScore)
-                .setAdvice(advice)
-                .setUser(session.getUser())
-                .setSession(session);
-        testResultRepository.save(testResultMapper.toEntity(testResult));
+        finalizeAndSaveTestResult(userScore, advice, session);
 
-        session.setIsFinished(true);
-        sessionRepository.save(session);
+        updateSessionToFinished(sessionDto);
 
         return new FinalizeTestResponse()
                 .setAdviceDescription(advice.getTitle())
@@ -215,23 +188,6 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                 .setScoreTo(advice.getScoreTo())
                 .setUserScore(userScore)
                 .setLinks(usefulLinks);
-    }
-
-    private List<AnswerDto> getUsersAllAnswersForTestBySession(SessionDto session) {
-
-        List<UserAnswersDto> userAnswersDtoList =
-                userAnswersRepository.findUserAnswersBySession(sessionMapper.toEntity(session))
-                        .stream().map(userAnswersMapper::toDto).toList();
-        return userAnswersDtoList.stream()
-                .map(UserAnswersDto::getAnswer).map(answerMapper::toDto).toList();
-    }
-
-    @Transactional
-    @Override
-    public long calculateUserScore(List<AnswerDto> answers) {
-        return answers.stream()
-                .mapToLong(AnswerDto::getScore)
-                .sum();
     }
 
     @Transactional
@@ -256,6 +212,75 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
 
         return new TestPageForUserResponse().setIncompleteTests(incompleteTestResponses)
                 .setTests(allTests);
+    }
+
+    private List<AnswerDto> getUsersAllAnswersForTestBySession(SessionDto session) {
+
+        List<UserAnswersDto> userAnswersDtoList =
+                userAnswersRepository.findUserAnswersBySession(sessionMapper.toEntity(session))
+                        .stream().map(userAnswersMapper::toDto).toList();
+        return userAnswersDtoList.stream()
+                .map(UserAnswersDto::getAnswer).map(answerMapper::toDto).toList();
+    }
+
+    private long calculateUserScore(List<AnswerDto> answers) {
+        return answers.stream()
+                .mapToLong(AnswerDto::getScore)
+                .sum();
+    }
+
+    private List<QuestionDto> getQuestionsFromRequestWithOnePossibleAnswer(UserAnswersRequest userAnswersRequest) {
+        List<Long> questionIdsFromUserAnswersRequest = userAnswersRequest.getQuestionAnswerUserRequests()
+                .stream().map(QuestionAnswerUserRequest::getQuestionId).toList();
+        return questionRepository.findByQuestionIdsAndMultipleAnswers(questionIdsFromUserAnswersRequest, false)
+                .stream().map(questionMapper::toDto).toList();
+    }
+
+    private boolean checkIfThereAreMultipleAnswersForQuestionWithOneAnswer(QuestionAnswerUserRequest questionAnswerUserRequest,
+                                                                           List<QuestionDto> questionsFromRequestWithOnePossibleAnswer) {
+
+        return questionAnswerUserRequest.getAnswerIds().size() > 1 &&
+                questionsFromRequestWithOnePossibleAnswer.stream().map(QuestionDto::getId)
+                        .anyMatch(id -> Objects.equals(id, questionAnswerUserRequest.getQuestionId()));
+    }
+
+    private boolean checkIfAnswersForQuestionAlreadySubmitted(UserAnswersRequest userAnswersRequest, Session session) {
+        List<Long> answerIdsInRequest = new ArrayList<>();
+        userAnswersRequest.getQuestionAnswerUserRequests().forEach(
+                qa -> answerIdsInRequest.addAll(qa.getAnswerIds()));
+        List<Answer> answers = answerRepository.findAllById(answerIdsInRequest);
+        List<UserAnswersDto> savedUserAnswersBySessionAndAnswers = userAnswersRepository.findUserAnswersBySessionAndAnswers(session, answers)
+                .stream().map(userAnswersMapper::toDto).toList();
+        return savedUserAnswersBySessionAndAnswers.size() > 0;
+    }
+
+    private boolean checkIfAllQuestionsAreAnswered(SessionDto sessionDto, List<AnswerDto> userFinalAnswersForTest) {
+        Long testId = sessionDto.getTest().getId();
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new TestProcessingException(CANNOT_FIND_TEST + testId));
+        List<Question> allQuestionsOfTest = questionRepository.findAllByTest(test);
+
+        for (Question question : allQuestionsOfTest) {
+            if (userFinalAnswersForTest.stream().map(AnswerDto::getQuestion)
+                    .noneMatch(userQuestion -> userQuestion.equals(question))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void updateSessionToFinished(SessionDto sessionDto) {
+        sessionDto.setIsFinished(true);
+        sessionRepository.save(sessionMapper.toEntity(sessionDto));
+    }
+
+    private void finalizeAndSaveTestResult(long userScore, Advice advice, Session session) {
+        TestResultDto testResult = new TestResultDto()
+                .setResult(userScore)
+                .setAdvice(advice)
+                .setUser(session.getUser())
+                .setSession(session);
+        testResultRepository.save(testResultMapper.toEntity(testResult));
     }
 
     private PageRequest createPageRequest(int skip, int take, String... sortBy) {

@@ -1,13 +1,12 @@
 package com.epam.rd.model.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
 @Entity(name = "advice_links")
+@Data
 public class AdviceLink {
 
     @Id

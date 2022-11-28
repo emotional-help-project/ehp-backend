@@ -1,16 +1,12 @@
 package com.epam.rd.model.entity;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
 @Entity(name = "sessions")
-@RequiredArgsConstructor
+@Data
 @Accessors(chain = true)
 public class Session {
 

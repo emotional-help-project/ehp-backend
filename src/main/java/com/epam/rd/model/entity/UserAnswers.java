@@ -1,13 +1,11 @@
 package com.epam.rd.model.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
 @Entity(name = "user_answers")
+@Data
 public class UserAnswers {
 
     @Id
