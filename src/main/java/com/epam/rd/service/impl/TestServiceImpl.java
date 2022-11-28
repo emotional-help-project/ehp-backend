@@ -31,6 +31,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
     private static final String CANNOT_FIND_ANSWER = "Cannot find answer with ID=";
     private static final String CANNOT_FIND_ADVICE_FOR_USER_SCORE = "Cannot find advice for user's score=";
     private static final String ONLY_ONE_ANSWER_FOR_QUESTION = "Only one answer can be submitted for question with ID=";
+    private static final String ANSWER_FOR_QUESTION_ALREADY_EXISTS = "Answer has been already saved for the question";
     private final TestRepository testRepository;
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
@@ -47,6 +48,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
     private final SessionMapper sessionMapper;
     private final TestMapper testMapper;
     private final LinkMapper linkMapper;
+
     public TestServiceImpl(BaseRepository<Test> baseRepository, TestRepository testRepository,
                            SessionRepository sessionRepository, UserRepository userRepository,
                            UserAnswersRepository userAnswersRepository, QuestionRepository questionRepository,
@@ -141,6 +143,16 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new SessionProcessingException(CANNOT_FIND_SESSION + sessionId));
 
+        List<Long> answerIdsInRequest = new ArrayList<>();
+        userAnswersRequest.getQuestionAnswerUserRequests().forEach(
+                qa -> answerIdsInRequest.addAll(qa.getAnswerIds()));
+        List<Answer> answers = answerRepository.findAllById(answerIdsInRequest);
+        List<UserAnswersDto> savedUserAnswersBySessionAndAnswers = userAnswersRepository.findUserAnswersBySessionAndAnswers(session, answers)
+                .stream().map(userAnswersMapper::toDto).toList();
+        if (savedUserAnswersBySessionAndAnswers.size() > 0) {
+            throw new TestProcessingException(ANSWER_FOR_QUESTION_ALREADY_EXISTS);
+        }
+
         List<UserAnswersDto> userAnswersDtoListToBeSaved = new ArrayList<>();
 
         userAnswersRequest.getQuestionAnswerUserRequests()
@@ -154,6 +166,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                                                 .orElseThrow(() -> new AnswerProcessingException(CANNOT_FIND_ANSWER + answerId)))
                                         .setSession(session)
                         )));
+
 
         userAnswersDtoListToBeSaved.forEach(userAnswersDto -> userAnswersRepository.save(
                 userAnswersMapper.toEntity(userAnswersDto)
