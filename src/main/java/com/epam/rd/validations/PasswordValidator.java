@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 @Component
 public class PasswordValidator implements ConstraintValidator<ValidPassword, String> {
-    private static final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()-\\[{}\\]:;'.,?\\*~$^+=<>]).{8,}$";
+    private static final String PASSWORD_PATTERN = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])((?=.*\\W)|(?=.*_))^[^ ]{8,}$";
 
     @Override
     public boolean isValid(final String password, final ConstraintValidatorContext context) {
