@@ -59,8 +59,4 @@ public class UserController {
         return userService.searchUser(request);
     }
 
-    @PutMapping(value = "/updateProfile")
-    public ResponseEntity<?> updateProfile(@Valid @RequestBody UpdateUserProfileRequest updateUserProfileRequest) {
-        return ResponseEntity.ok(userService.updateUserProfile(updateUserProfileRequest));
-    }
 }
