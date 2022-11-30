@@ -1,5 +1,6 @@
 package com.epam.rd.service;
 
+import com.epam.rd.payload.response.EmotionMapResponse;
 import com.epam.rd.payload.response.FinalizeTestResponse;
 import com.epam.rd.payload.request.UserAnswersRequest;
 import com.epam.rd.model.entity.Test;
@@ -27,4 +28,5 @@ public interface TestService extends CommonService<Test, Long> {
 
     TestPageForUserResponse getAllTestsForUser(Long userId, int skip, int take);
 
+    EmotionMapResponse getEmotionMapByTest(Long userId, Long testId);
 }

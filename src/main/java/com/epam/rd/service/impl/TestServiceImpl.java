@@ -214,6 +214,24 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                 .setTests(allTests);
     }
 
+    @Transactional
+    @Override
+    public EmotionMapResponse getEmotionMapByTest(Long userId, Long testId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserProcessingException(CANNOT_FIND_USER + userId));
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new TestProcessingException(CANNOT_FIND_TEST + testId));
+        List<TestResultDto> testResultsByUserAndTest = testResultRepository.getTestResultsByUserAndTest(user, test)
+                .stream().map(testResultMapper::toDto).toList();
+
+        List<TestResultStatisticsResponse> testResultStatistics = new ArrayList<>();
+        testResultsByUserAndTest.forEach(tr -> testResultStatistics.add(
+                new TestResultStatisticsResponse().setTestDateTime(tr.getDateTime())
+                        .setResult(tr.getResult())
+        ));
+        return new EmotionMapResponse().setTestResultStatistics(testResultStatistics);
+    }
+
     private List<AnswerDto> getUsersAllAnswersForTestBySession(SessionDto session) {
 
         List<UserAnswersDto> userAnswersDtoList =
