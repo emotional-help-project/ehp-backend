@@ -1,10 +1,8 @@
 package com.epam.rd.model.entity;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
