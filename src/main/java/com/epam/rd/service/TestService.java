@@ -1,11 +1,8 @@
 package com.epam.rd.service;
 
-import com.epam.rd.payload.response.EmotionMapResponse;
-import com.epam.rd.payload.response.FinalizeTestResponse;
+import com.epam.rd.payload.response.*;
 import com.epam.rd.payload.request.UserAnswersRequest;
 import com.epam.rd.model.entity.Test;
-import com.epam.rd.payload.response.TestPageForUserResponse;
-import com.epam.rd.payload.response.TestQuestionsResponse;
 
 import java.util.List;
 
@@ -29,4 +26,6 @@ public interface TestService extends CommonService<Test, Long> {
     TestPageForUserResponse getAllTestsForUser(Long userId, int skip, int take);
 
     EmotionMapResponse getEmotionMapByTest(Long userId, Long testId);
+
+    UserEmotionStatisticsResponse getUserEmotionStatistics(Long id);
 }

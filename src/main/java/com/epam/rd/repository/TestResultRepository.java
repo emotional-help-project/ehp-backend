@@ -19,4 +19,10 @@ public interface TestResultRepository extends BaseRepository<TestResult> {
     )
     List<TestResult> getTestResultsByUserAndTest(@Param("user") User user,
                                                  @Param("test") Test test);
+
+    @Query("SELECT tr FROM test_results tr " +
+            "INNER JOIN FETCH sessions s ON s = tr.session " +
+            "WHERE tr.user = :user"
+    )
+    List<TestResult> getUserTestResults(@Param("user") User user);
 }

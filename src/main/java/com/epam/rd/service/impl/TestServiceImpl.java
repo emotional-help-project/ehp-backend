@@ -175,8 +175,6 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         long userScore = calculateUserScore(userFinalAnswersForTest);
         Advice advice = adviceRepository.findAdviceByUserScore(userScore)
                 .orElseThrow(() -> new AdviceProcessingException(CANNOT_FIND_ADVICE_FOR_USER_SCORE + userScore));
-        List<LinkDto> usefulLinks = linkRepository.getLinksForAdvice(advice)
-                .stream().map(linkMapper::toDto).toList();
 
         finalizeAndSaveTestResult(userScore, advice, session);
 
@@ -187,7 +185,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                 .setScoreFrom(advice.getScoreFrom())
                 .setScoreTo(advice.getScoreTo())
                 .setUserScore(userScore)
-                .setLinks(usefulLinks);
+                .setLinks(getUsefulLinksForAdvice(advice));
     }
 
     @Transactional
@@ -230,6 +228,26 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                         .setResult(tr.getResult())
         ));
         return new EmotionMapResponse().setTestResultStatistics(testResultStatistics);
+    }
+
+    @Transactional
+    @Override
+    public UserEmotionStatisticsResponse getUserEmotionStatistics(Long userId) {
+        List<UserTestEmotionStatistics> emotionStatistics = new ArrayList<>();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserProcessingException(CANNOT_FIND_USER + userId));
+        List<TestResult> userTestResults = testResultRepository.getUserTestResults(user);
+
+        userTestResults.forEach(utr -> emotionStatistics.add(
+                new UserTestEmotionStatistics().setTestTitle(utr.getSession().getTest().getTitle())
+                        .setTestTypeTitle(utr.getSession().getTest().getTestType().getTitle())
+                        .setDateTime(utr.getDateTime())
+                        .setResult(utr.getResult())
+                        .setAdviceDescription(utr.getAdvice().getTitle())
+                        .setLinks(getUsefulLinksForAdvice(utr.getAdvice())
+                        )));
+
+        return new UserEmotionStatisticsResponse().setEmotionStatistics(emotionStatistics);
     }
 
     private List<AnswerDto> getUsersAllAnswersForTestBySession(SessionDto session) {
@@ -299,6 +317,11 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                 .setUser(session.getUser())
                 .setSession(session);
         testResultRepository.save(testResultMapper.toEntity(testResult));
+    }
+
+    private List<LinkDto> getUsefulLinksForAdvice(Advice advice) {
+        return linkRepository.getLinksForAdvice(advice)
+                .stream().map(linkMapper::toDto).toList();
     }
 
     private PageRequest createPageRequest(int skip, int take, String... sortBy) {

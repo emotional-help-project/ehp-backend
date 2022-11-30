@@ -42,4 +42,9 @@ public class UserProfileController {
                                                  @PathVariable Long testId) {
         return ResponseEntity.ok(testService.getEmotionMapByTest(userId, testId));
     }
+
+    @GetMapping("/{id}/statistics")
+    public ResponseEntity<?> getUserEmotionStatistics(@PathVariable Long id) {
+        return ResponseEntity.ok(testService.getUserEmotionStatistics(id));
+    }
 }
