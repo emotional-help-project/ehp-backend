@@ -13,5 +13,5 @@ public class QuestionDto {
     private String title;
     private Integer number;
     private Test test;
-    private Boolean multiple_answers;
+    private Boolean multipleAnswers;
 }

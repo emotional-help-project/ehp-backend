@@ -10,6 +10,7 @@ import java.util.List;
 public class QuestionAnswersResponse {
 
     private Long questionId;
+    private boolean allowsMultipleAnswers;
     private String questionText;
     private List<AnswerResponse> answers;
 
