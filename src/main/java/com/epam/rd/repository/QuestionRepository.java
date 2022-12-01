@@ -18,7 +18,7 @@ public interface QuestionRepository extends BaseRepository<Question> {
 
     Long countByTest(@Param(value = "test") Test test);
 
-    @Query("SELECT q FROM questions q WHERE q.id in :questionIds AND q.multiple_answers = :multipleAnswers")
+    @Query("SELECT q FROM questions q WHERE q.id in :questionIds AND q.multipleAnswers = :multipleAnswers")
     List<Question> findByQuestionIdsAndMultipleAnswers(@Param("questionIds") List<Long> questionIds,
                                                        @Param("multipleAnswers") Boolean multipleAnswers);
 

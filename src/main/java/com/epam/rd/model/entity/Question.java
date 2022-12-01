@@ -16,19 +16,19 @@ public class Question extends BaseEntity {
     private Integer number;
     @ManyToOne
     private Test test;
-    @Column
-    private Boolean multiple_answers;
+    @Column(name = "multiple_answers")
+    private Boolean multipleAnswers;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Question question)) return false;
         if (!super.equals(o)) return false;
-        return Objects.equals(number, question.number) && Objects.equals(test, question.test) && Objects.equals(multiple_answers, question.multiple_answers);
+        return Objects.equals(number, question.number) && Objects.equals(test, question.test) && Objects.equals(multipleAnswers, question.multipleAnswers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), number, test, multiple_answers);
+        return Objects.hash(super.hashCode(), number, test, multipleAnswers);
     }
 }

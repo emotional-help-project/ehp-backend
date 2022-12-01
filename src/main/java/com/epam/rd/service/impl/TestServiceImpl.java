@@ -93,6 +93,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         List<QuestionAnswersResponse> items = new ArrayList<>();
         questionsPaginated.forEach(q -> items.add(new QuestionAnswersResponse()
                 .setQuestionId(q.getId())
+                .setAllowsMultipleAnswers(q.getMultipleAnswers())
                 .setQuestionText(q.getTitle())
                 .setAnswers(answerRepository.findByQuestion(questionMapper.toEntity(q)).stream()
                         .map(a -> new AnswerResponse().setAnswerId(a.getId())
