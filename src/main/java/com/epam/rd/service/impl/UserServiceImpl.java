@@ -129,8 +129,9 @@ public class UserServiceImpl implements UserService {
         ));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtTokenProvider.generateToken(authentication);
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_EMAIL));
 
-        return new JWTTokenSuccessResponse(true, jwt);
+        return new JWTTokenSuccessResponse(true, jwt, user.getId(), user.getFirstName());
     }
 
     @Transactional

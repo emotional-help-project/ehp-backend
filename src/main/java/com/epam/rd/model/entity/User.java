@@ -34,7 +34,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Min(value = 3)
+    @Min(value = 5, message = "User age should not be less than 5 years old.")
     private int age;
 
     @Enumerated(EnumType.STRING)

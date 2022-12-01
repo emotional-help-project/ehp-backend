@@ -9,4 +9,6 @@ public class JWTTokenSuccessResponse {
 
     private boolean success;
     private String token;
+    private Long userId;
+    private String firstName;
 }
