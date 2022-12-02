@@ -3,8 +3,8 @@ VALUES (25, 'test@email', 'Ron', 'MALE', 'Smith', 'pass123', 'USER');
 
 INSERT INTO test_types (title)
 VALUES ('Health');
-INSERT INTO tests (title, test_type_id)
-VALUES ('Depression test', 1);
+INSERT INTO tests (title, test_type_id, description, image_url)
+VALUES ('Depression test', 1, 'This depression quiz is based on the Depression Screening Test developed by Ivan K. Goldberg, MD who was also a renowned psychiatrist.', 'some/url/here');
 
 INSERT INTO questions (title, multiple_answers, number, test_id)
 VALUES ('Do you suffer from extreme mood changes (e.g. going from extremely "happy" to extremely "sad")?',

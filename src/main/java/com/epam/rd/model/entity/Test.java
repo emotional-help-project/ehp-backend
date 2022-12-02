@@ -16,6 +16,9 @@ public class Test extends BaseEntity {
     @ManyToOne
     private TestType testType;
 
+    private String description;
+    private String imageUrl;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
