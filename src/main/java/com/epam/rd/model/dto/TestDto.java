@@ -13,5 +13,6 @@ public class TestDto {
     private Long id;
     private String title;
     private TestType testType;
-
+    private String description;
+    private String imageUrl;
 }
