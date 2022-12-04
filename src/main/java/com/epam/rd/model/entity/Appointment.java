@@ -13,29 +13,40 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity(name = "test_results")
+@Entity(name = "appointments")
 @Data
 @EntityListeners(AuditingEntityListener.class)
-public class TestResult {
+public class Appointment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
-    private Long result;
 
-    @CreatedDate
-    @Column(name = "date_time", nullable = false, updatable = false)
+    @ManyToOne
+    private Psychologist psychologist;
+
+    @ManyToOne
+    private User user;
+
     @JsonFormat(pattern = "yyyy-MM-dd  HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd  HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime dateTime;
+    private LocalDateTime startDateTime;
 
-    @ManyToOne
-    private User user;
-    @OneToOne
-    private Advice advice;
-    @OneToOne
-    private Session session;
+    @JsonFormat(pattern = "yyyy-MM-dd  HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd  HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime endDateTime;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd  HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd  HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime dateCreated;
+
 
 }
