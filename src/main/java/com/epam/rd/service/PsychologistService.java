@@ -12,4 +12,5 @@ public interface PsychologistService {
 
     AppointmentCalendarResponse getAppointmentCalendarByPsychologist(Long psychologistId, LocalDateTime currentDateTime);
 
+    List<PsychologistDto> getAllPsychologists();
 }
