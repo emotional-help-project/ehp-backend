@@ -39,3 +39,6 @@ VALUES ('Overcoming depression: How psychologists help with depressive disorders
 INSERT INTO advice_links (advice_id, link_id)
 VALUES (1, 1),
        (1, 2);
+
+INSERT INTO psychologists (age, education, email, first_name, gender, last_name, license, qualification)
+VALUES (79, 'Harvard University', 'trivers@email.com', 'ROBERT', 'MALE', 'Trivers', 'AFK096548', 'PhD');

@@ -25,8 +25,5 @@ public class PsychologistController {
         return ResponseEntity.ok(psychologistService.getAppointmentCalendarByPsychologist(psychologistId, currentDateTime));
     }
 
-    @PostMapping("/appoint")
-    public ResponseEntity<?> makeAnAppointment() {
-        return null;
-    }
+
 }

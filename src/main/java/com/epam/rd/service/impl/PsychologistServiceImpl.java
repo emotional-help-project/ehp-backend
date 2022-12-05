@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,20 +44,12 @@ public class PsychologistServiceImpl implements PsychologistService {
                 .stream().map(psychologistMapper::toDto).toList();
     }
 
+    // TODO provide functionality when a user can get calendar, see available and booked slots of the psychologist
+    //  and choose one of the free slots
     @Transactional
     @Override
     public AppointmentCalendarResponse getAppointmentCalendarByPsychologist(Long psychologistId, LocalDateTime currentDateTime) {
-        Psychologist psychologist = psychologistRepository.findById(psychologistId)
-                .orElseThrow(() -> new PsychologistProcessingException(CANNOT_FIND_PSYCHOLOGIST));
-        List<StandardPsyWorkDays> standardPsyWorkDays = standardPsyWorkDaysRepository.findAllByPsychologist(psychologist);
-        List<OccasionalPsyWorkTime> occasionalPsyWorkTimes = occasionalPsyWorkTimeRepository.findAllByPsychologist(psychologist);
-        List<Appointment> bookedAppointmentsByPsychologist = appointmentRepository.findBookedAppointmentsByPsychologist(psychologist, currentDateTime);
-
-        List<AppointmentSchedule> appointmentSchedule = new ArrayList<>();
-        
-
         return null;
     }
-
 
 }
