@@ -1,5 +1,6 @@
 package com.epam.rd.controller;
 
+import com.epam.rd.payload.request.AdviceAdminRequest;
 import com.epam.rd.payload.request.QuestionAnswerAdminRequest;
 import com.epam.rd.service.AdminService;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,11 @@ public class AdminController {
     @PostMapping("/test")
     public ResponseEntity<?> addQuestionAnswersForTest(@RequestBody QuestionAnswerAdminRequest request) {
         return new ResponseEntity<>(adminService.addQuestionAnswersForTest(request), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/advice")
+    public ResponseEntity<?> addAdviceWithLinksForTest(@RequestBody AdviceAdminRequest request) {
+        return new ResponseEntity<>(adminService.addAdviceWithLinksForTest(request), HttpStatus.CREATED);
     }
 
 
