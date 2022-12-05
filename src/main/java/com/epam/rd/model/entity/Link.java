@@ -1,11 +1,11 @@
 package com.epam.rd.model.entity;
 
+import com.epam.rd.model.enumerations.LinkCategory;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Getter
@@ -13,8 +13,11 @@ import java.util.Objects;
 @Entity(name = "links")
 @ToString
 public class Link extends BaseEntity{
-    @Column
+    @Column(nullable = false)
     private String link;
+
+    @Enumerated(EnumType.STRING)
+    private LinkCategory linkCategory;
 
     @Override
     public boolean equals(Object o) {
