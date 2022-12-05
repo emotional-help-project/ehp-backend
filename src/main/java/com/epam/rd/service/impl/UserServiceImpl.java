@@ -156,7 +156,10 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(UserDto userDto) {
         User user;
         if (userRepository.existsById(userDto.getId())) {
-            user = userRepository.save(userMapper.toEntity(userDto));
+            User userToBeUpdated = userMapper.toEntity(userDto);
+            userToBeUpdated.setPassword(userRepository.findById(userDto.getId())
+                    .orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_ID)).getPassword());
+            user = userRepository.save(userToBeUpdated);
         } else {
             log.error(UPDATE_EXCEPTION);
             throw new UserProcessingException(UPDATE_EXCEPTION);
