@@ -6,6 +6,7 @@ import com.epam.rd.model.enumerations.Gender;
 import com.epam.rd.payload.request.LoginRequest;
 import com.epam.rd.payload.request.SearchRequest;
 import com.epam.rd.payload.request.SignupRequest;
+import com.epam.rd.payload.request.UpdateUserProfileRequest;
 import com.epam.rd.payload.response.JWTTokenSuccessResponse;
 import org.springframework.data.domain.Page;
 
@@ -37,4 +38,6 @@ public interface UserService {
     Page<UserDto> getAllUsersPaginated(int pageNum, int pageSize);
 
     Page<UserDto> searchUser(SearchRequest request);
+
+    UserDto updateUserProfile(UpdateUserProfileRequest updateUserProfile);
 }

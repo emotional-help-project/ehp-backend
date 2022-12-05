@@ -10,6 +10,7 @@ import com.epam.rd.model.search.SearchSpecification;
 import com.epam.rd.payload.request.LoginRequest;
 import com.epam.rd.payload.request.SearchRequest;
 import com.epam.rd.payload.request.SignupRequest;
+import com.epam.rd.payload.request.UpdateUserProfileRequest;
 import com.epam.rd.payload.response.JWTTokenSuccessResponse;
 import com.epam.rd.repository.UserRepository;
 import com.epam.rd.security.JWTTokenProvider;
@@ -180,6 +181,42 @@ public class UserServiceImpl implements UserService {
         SearchSpecification<User> specification = new SearchSpecification<>(request);
         Pageable pageable = SearchSpecification.getPageable(request.getPage(), request.getSize());
         return userRepository.findAll(specification, pageable).map(userMapper::toDto);
+    }
+
+    @Transactional
+    @Override
+    public UserDto updateUserProfile(UpdateUserProfileRequest updateUserProfile) {
+
+        User updatedUser = userRepository.findById(updateUserProfile.getId())
+                .orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_ID));
+
+        if (updateUserProfile.getFirstName() != null) {
+            updatedUser.setFirstName(updateUserProfile.getFirstName());
+        }
+
+        if (updateUserProfile.getLastName() != null) {
+            updatedUser.setLastName(updateUserProfile.getLastName());
+        }
+
+        if (updateUserProfile.getEmail() != null) {
+            updatedUser.setEmail(updateUserProfile.getEmail());
+        }
+
+        if (updateUserProfile.getNewPassword() != null) {
+            final String encodedPassword = passwordEncoder.encode(updateUserProfile.getNewPassword());
+            updatedUser.setPassword(encodedPassword);
+        }
+
+        if (updateUserProfile.getGender() != null) {
+            updatedUser.setGender(updateUserProfile.getGender());
+        }
+
+        if (updateUserProfile.getAge() > 0) {
+            updatedUser.setAge(updateUserProfile.getAge());
+        }
+
+        userRepository.save(updatedUser);
+        return userMapper.toDto(updatedUser);
     }
 
     private PageRequest createPageRequest(int pageNum, int pageSize) {

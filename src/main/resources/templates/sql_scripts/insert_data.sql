@@ -1,5 +1,5 @@
 INSERT INTO users (age, email, first_name, gender, last_name, password, role)
-VALUES (25, 'test@email', 'Ron', 'MALE', 'Smith', 'pass123', 'USER');
+VALUES (25, 'test@email.com', 'Ron', 'MALE', 'Smith', 'Pass123!', 'USER');
 
 INSERT INTO test_types (title)
 VALUES ('Health');
