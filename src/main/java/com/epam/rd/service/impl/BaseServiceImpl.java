@@ -28,7 +28,8 @@ public class BaseServiceImpl<ENTITY extends BaseEntity, L extends Number> implem
         if (entity.getId() == null) {
             baseRepository.save(entity);
         }
-        throw new BadRequest("ID must be bull");
+        else throw new BadRequest("ID must be bull");
+        return entity;
     }
 
     @Override
@@ -36,7 +37,8 @@ public class BaseServiceImpl<ENTITY extends BaseEntity, L extends Number> implem
         if (entity.getId() != null) {
             baseRepository.save(entity);
         }
-        throw new BadRequest("ID must not be bull");
+        else throw new BadRequest("ID must not be bull");
+        return entity;
     }
 
     @Override
