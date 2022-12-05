@@ -9,6 +9,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class TestQuestionsResponse {
 
+    private String testTitle;
     private long totalNumberOfTestQuestions;
     private List<QuestionAnswersResponse> items;
 }
