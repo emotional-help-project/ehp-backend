@@ -52,4 +52,10 @@ public class PsychologistServiceImpl implements PsychologistService {
         return null;
     }
 
+    @Transactional
+    @Override
+    public List<PsychologistDto> getAllPsychologists() {
+        return psychologistRepository.findAll().stream().map(psychologistMapper::toDto).toList();
+    }
+
 }

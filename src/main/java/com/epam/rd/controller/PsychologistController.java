@@ -14,9 +14,14 @@ public class PsychologistController {
 
     private final PsychologistService psychologistService;
 
-    @GetMapping()
+    @GetMapping("/available")
     public ResponseEntity<?> getPsychologistsForAppointment(@RequestParam LocalDateTime currentDateTime) {
         return ResponseEntity.ok(psychologistService.getAvailablePsychologists(currentDateTime));
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllPsychologists() {
+        return ResponseEntity.ok(psychologistService.getAllPsychologists());
     }
 
     @GetMapping("/psy/{psychologistId}")
