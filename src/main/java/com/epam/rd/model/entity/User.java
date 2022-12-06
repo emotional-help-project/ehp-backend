@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,7 +35,8 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Min(value = 3)
+    @Min(value = 5, message = "User age should not be less than 5 years old.")
+    @Max(value = 150, message = "User age should be less than 150 years old.")
     private int age;
 
     @Enumerated(EnumType.STRING)

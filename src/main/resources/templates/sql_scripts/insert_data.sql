@@ -1,10 +1,10 @@
 INSERT INTO users (age, email, first_name, gender, last_name, password, role)
-VALUES (25, 'test@email', 'Ron', 'MALE', 'Smith', 'pass123', 'USER');
+VALUES (25, 'test@email.com', 'Ron', 'MALE', 'Smith', 'Pass123!', 'USER');
 
 INSERT INTO test_types (title)
 VALUES ('Health');
-INSERT INTO tests (title, test_type_id)
-VALUES ('Depression test', 1);
+INSERT INTO tests (title, test_type_id, description, image_url)
+VALUES ('Depression test', 1, 'This depression quiz is based on the Depression Screening Test developed by Ivan K. Goldberg, MD who was also a renowned psychiatrist.', 'some/url/here');
 
 INSERT INTO questions (title, multiple_answers, number, test_id)
 VALUES ('Do you suffer from extreme mood changes (e.g. going from extremely "happy" to extremely "sad")?',
@@ -39,3 +39,6 @@ VALUES ('Overcoming depression: How psychologists help with depressive disorders
 INSERT INTO advice_links (advice_id, link_id)
 VALUES (1, 1),
        (1, 2);
+
+INSERT INTO psychologists (age, education, email, first_name, gender, last_name, license, qualification)
+VALUES (79, 'Harvard University', 'trivers@email.com', 'ROBERT', 'MALE', 'Trivers', 'AFK096548', 'PhD');

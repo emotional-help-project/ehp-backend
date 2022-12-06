@@ -6,17 +6,25 @@ import com.epam.rd.model.entity.User;
 import com.epam.rd.model.enumerations.URole;
 import com.epam.rd.exceptions.UserExistException;
 import com.epam.rd.model.mapper.UserMapper;
+import com.epam.rd.model.search.SearchSpecification;
 import com.epam.rd.payload.request.LoginRequest;
+import com.epam.rd.payload.request.SearchRequest;
 import com.epam.rd.payload.request.SignupRequest;
+import com.epam.rd.payload.request.UpdateUserProfileRequest;
 import com.epam.rd.payload.response.JWTTokenSuccessResponse;
 import com.epam.rd.repository.UserRepository;
 import com.epam.rd.security.JWTTokenProvider;
 import com.epam.rd.service.UserService;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,17 +33,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private static final String USER_DOESNT_EXIST = "A user with this email does not exist";
+    private static final String USER_DOESNT_EXIST_BY_EMAIL = "A user with this email does not exist";
+    private static final String USER_DOESNT_EXIST_BY_ID = "A user with this ID does not exist";
+    private static final String UPDATE_EXCEPTION = "Can't update non existing data";
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JWTTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
-
     private final UserMapper userMapper;
 
     @Transactional
@@ -60,7 +72,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserByPrincipal(Principal principal) {
         User user = userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST));
+                .orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_EMAIL));
         return userMapper.toDto(user);
     }
 
@@ -78,7 +90,7 @@ public class UserServiceImpl implements UserService {
         String email = getPrincipal();
         User currentUser = new User();
         if (email != null) {
-            currentUser = userRepository.findByEmail(email).orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST));
+            currentUser = userRepository.findByEmail(email).orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_EMAIL));
         }
         return userMapper.toDto(currentUser);
     }
@@ -98,7 +110,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public UserDto getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_EMAIL));
         return userMapper.toDto(user);
     }
 
@@ -118,9 +130,96 @@ public class UserServiceImpl implements UserService {
         ));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtTokenProvider.generateToken(authentication);
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_EMAIL));
 
-        return new JWTTokenSuccessResponse(true, jwt);
+        return new JWTTokenSuccessResponse(true, jwt, user.getId(), user.getFirstName());
     }
 
+    @Transactional
+    @Override
+    public void deleteUser(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            userRepository.deleteById(id);
+        }
+    }
 
+    @Transactional(readOnly = true)
+    @Override
+    public UserDto getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_ID));
+        return userMapper.toDto(user);
+    }
+
+    @Transactional
+    @Override
+    public UserDto updateUser(UserDto userDto) {
+        User user;
+        if (userRepository.existsById(userDto.getId())) {
+            User userToBeUpdated = userMapper.toEntity(userDto);
+            userToBeUpdated.setPassword(userRepository.findById(userDto.getId())
+                    .orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_ID)).getPassword());
+            user = userRepository.save(userToBeUpdated);
+        } else {
+            log.error(UPDATE_EXCEPTION);
+            throw new UserProcessingException(UPDATE_EXCEPTION);
+        }
+        return userMapper.toDto(user);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<UserDto> getAllUsersPaginated(int pageNum, int pageSize) {
+        Pageable pageable = createPageRequest(pageNum, pageSize);
+        return userRepository.findAll(pageable).map(userMapper::toDto);
+    }
+
+    @Transactional
+    @Override
+    public Page<UserDto> searchUser(SearchRequest request) {
+        SearchSpecification<User> specification = new SearchSpecification<>(request);
+        Pageable pageable = SearchSpecification.getPageable(request.getPage(), request.getSize());
+        return userRepository.findAll(specification, pageable).map(userMapper::toDto);
+    }
+
+    @Transactional
+    @Override
+    public UserDto updateUserProfile(UpdateUserProfileRequest updateUserProfile) {
+
+        User updatedUser = userRepository.findById(updateUserProfile.getId())
+                .orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_ID));
+
+        if (updateUserProfile.getFirstName() != null) {
+            updatedUser.setFirstName(updateUserProfile.getFirstName());
+        }
+
+        if (updateUserProfile.getLastName() != null) {
+            updatedUser.setLastName(updateUserProfile.getLastName());
+        }
+
+        if (updateUserProfile.getEmail() != null) {
+            updatedUser.setEmail(updateUserProfile.getEmail());
+        }
+
+        if (updateUserProfile.getNewPassword() != null) {
+            final String encodedPassword = passwordEncoder.encode(updateUserProfile.getNewPassword());
+            updatedUser.setPassword(encodedPassword);
+        }
+
+        if (updateUserProfile.getGender() != null) {
+            updatedUser.setGender(updateUserProfile.getGender());
+        }
+
+        if (updateUserProfile.getAge() > 0) {
+            updatedUser.setAge(updateUserProfile.getAge());
+        }
+
+        userRepository.save(updatedUser);
+        return userMapper.toDto(updatedUser);
+    }
+
+    private PageRequest createPageRequest(int pageNum, int pageSize) {
+        return PageRequest.of(pageNum - 1, pageSize, Sort.by("id").descending());
+    }
 }
