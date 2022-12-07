@@ -1,6 +1,25 @@
 package com.epam.rd.service;
 
-import com.epam.rd.model.entity.Course;
+import com.epam.rd.model.dto.CourseDto;
+import com.epam.rd.payload.request.SearchRequest;
+import org.springframework.data.domain.Page;
 
-public interface CourseService extends CommonService<Course,Long>{
+import java.util.List;
+
+public interface CourseService {
+
+    CourseDto createCourse(CourseDto courseDto);
+
+    void deleteCourse(Long id);
+
+    CourseDto getCourseById(Long id);
+
+    CourseDto updateCourse(CourseDto CourseDto);
+
+    Page<CourseDto> getAllCoursesPaginated(int pageNum, int pageSize);
+
+    List<CourseDto> getAllCourses();
+
+    Page<CourseDto> searchCourse(SearchRequest request);
+
 }
