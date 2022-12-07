@@ -28,17 +28,15 @@ public class BaseServiceImpl<ENTITY extends BaseEntity, L extends Number> implem
     public ENTITY create(ENTITY entity) {
         if (entity.getId() == null) {
             baseRepository.save(entity);
-        }
-        else throw new BadRequest("ID must be bull");
-        return null;
+        } else throw new BadRequest("ID must be bull");
+        return entity;
     }
 
     @Override
     public ENTITY update(ENTITY entity) {
         if (entity.getId() != null) {
             baseRepository.save(entity);
-        }
-        else throw new BadRequest("ID must not be bull");
+        } else throw new BadRequest("ID must not be bull");
         return entity;
     }
 

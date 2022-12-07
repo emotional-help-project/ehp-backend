@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 @Entity(name = "advice_links")
 @Data
+@Accessors(chain = true)
 public class AdviceLink {
 
     @Id

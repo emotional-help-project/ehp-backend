@@ -8,4 +8,5 @@ import org.springframework.stereotype.Component;
 @Mapper(componentModel = "spring")
 @Component
 public abstract class AdviceMapper implements EntityMapper<AdviceDto, Advice> {
+
 }
