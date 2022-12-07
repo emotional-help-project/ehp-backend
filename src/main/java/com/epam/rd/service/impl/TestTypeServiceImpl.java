@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class TypeServiceImpl extends BaseServiceImpl<TestType, Long> {
+public class TestTypeServiceImpl extends BaseServiceImpl<TestType, Long> {
 
-    public TypeServiceImpl(BaseRepository<TestType> baseRepository) {
+    public TestTypeServiceImpl(BaseRepository<TestType> baseRepository) {
         super(baseRepository);
     }
 }

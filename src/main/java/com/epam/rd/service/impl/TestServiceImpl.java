@@ -104,7 +104,9 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                         .toList())));
 
         Long totalNumberOfTestQuestions = questionRepository.countByTest(test);
-        return new TestQuestionsResponse().setTotalNumberOfTestQuestions(totalNumberOfTestQuestions)
+        return new TestQuestionsResponse()
+                .setTestTitle(test.getTitle())
+                .setTotalNumberOfTestQuestions(totalNumberOfTestQuestions)
                 .setItems(items);
     }
 
@@ -228,7 +230,9 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
                 new TestResultStatisticsResponse().setTestDateTime(tr.getDateTime())
                         .setResult(tr.getResult())
         ));
-        return new EmotionMapResponse().setTestResultStatistics(testResultStatistics);
+        return new EmotionMapResponse()
+                .setTestTitle(test.getTitle())
+                .setTestResultStatistics(testResultStatistics);
     }
 
     @Transactional
