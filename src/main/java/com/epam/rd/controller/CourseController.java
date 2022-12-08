@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/courses")
@@ -21,7 +19,7 @@ public class CourseController {
 
     @PostMapping
     public ResponseEntity<?> createCourse(@RequestBody CourseDto courseDto) {
-        return ResponseEntity.ok(courseService.createCourse(courseDto));
+        return new ResponseEntity<>(courseService.createCourse(courseDto), HttpStatus.CREATED);
 
     }
 
@@ -58,4 +56,9 @@ public class CourseController {
         return courseService.searchCourse(request);
     }
 
+    @PostMapping("/{id}/book")
+    public ResponseEntity<?> bookCourse(@PathVariable Long id,
+                                        @RequestParam Long userId) {
+        return ResponseEntity.ok(courseService.bookCourseForUser(id, userId));
+    }
 }
