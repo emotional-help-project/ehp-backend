@@ -1,13 +1,10 @@
 package com.epam.rd.controller;
 
 import com.epam.rd.model.dto.UserDto;
-import com.epam.rd.payload.request.SearchRequest;
 import com.epam.rd.payload.request.UpdateUserProfileRequest;
 import com.epam.rd.service.TestService;
 import com.epam.rd.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,5 +43,10 @@ public class UserProfileController {
     @GetMapping("/{id}/statistics")
     public ResponseEntity<?> getUserEmotionStatistics(@PathVariable Long id) {
         return ResponseEntity.ok(testService.getUserEmotionStatistics(id));
+    }
+
+    @GetMapping("/tests")
+    public ResponseEntity<?> getTestsFinishedByUser(@RequestParam Long userId) {
+        return ResponseEntity.ok(testService.getTestsFinishedByUser(userId));
     }
 }
