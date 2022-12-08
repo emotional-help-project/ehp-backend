@@ -49,8 +49,8 @@ public class CourseController {
     }
 
     @GetMapping
-    public List<CourseDto> getAll() {
-        return courseService.getAllCourses();
+    public ResponseEntity<?> getAll() {
+        return ResponseEntity.ok(courseService.getAllCourses());
     }
 
     @PostMapping(value = "/search")
