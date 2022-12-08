@@ -2,6 +2,7 @@ package com.epam.rd.service;
 
 import com.epam.rd.model.dto.CourseDto;
 import com.epam.rd.payload.request.SearchRequest;
+import com.epam.rd.payload.response.BookedCourseResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -22,4 +23,5 @@ public interface CourseService {
 
     Page<CourseDto> searchCourse(SearchRequest request);
 
+    BookedCourseResponse bookCourseForUser(Long id, Long userId);
 }
