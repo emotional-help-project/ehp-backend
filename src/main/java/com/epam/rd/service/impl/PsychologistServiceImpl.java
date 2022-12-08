@@ -1,13 +1,14 @@
 package com.epam.rd.service.impl;
 
 import com.epam.rd.exceptions.PsychologistProcessingException;
+import com.epam.rd.exceptions.PsychologistProcessingException;
 import com.epam.rd.model.dto.PsychologistDto;
-import com.epam.rd.model.entity.Appointment;
-import com.epam.rd.model.entity.OccasionalPsyWorkTime;
-import com.epam.rd.model.entity.Psychologist;
-import com.epam.rd.model.entity.StandardPsyWorkDays;
+import com.epam.rd.model.dto.PsychologistDto;
+import com.epam.rd.model.entity.*;
 import com.epam.rd.model.enumerations.SlotType;
 import com.epam.rd.model.mapper.PsychologistMapper;
+import com.epam.rd.model.search.SearchSpecification;
+import com.epam.rd.payload.request.SearchRequest;
 import com.epam.rd.payload.response.AppointmentCalendarResponse;
 import com.epam.rd.payload.response.AppointmentSchedule;
 import com.epam.rd.repository.AppointmentRepository;
@@ -16,14 +17,20 @@ import com.epam.rd.repository.PsychologistRepository;
 import com.epam.rd.repository.StandardPsyWorkDaysRepository;
 import com.epam.rd.service.PsychologistService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -37,7 +44,7 @@ public class PsychologistServiceImpl implements PsychologistService {
     private AppointmentRepository appointmentRepository;
     private PsychologistMapper psychologistMapper;
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public List<PsychologistDto> getAvailablePsychologists(LocalDateTime currentDateTime) {
         return psychologistRepository.findAvailablePsychologists(currentDateTime)
@@ -52,10 +59,97 @@ public class PsychologistServiceImpl implements PsychologistService {
         return null;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public List<PsychologistDto> getAllPsychologists() {
         return psychologistRepository.findAll().stream().map(psychologistMapper::toDto).toList();
+    }
+
+    @Transactional
+    @Override
+    public PsychologistDto createPsychologist(PsychologistDto psychologistDto) {
+        return psychologistMapper.toDto(psychologistRepository.save(psychologistMapper.toEntity(psychologistDto)));
+    }
+
+    @Transactional
+    @Override
+    public void deletePsychologist(Long id) {
+        Optional<Psychologist> psychologist = psychologistRepository.findById(id);
+        if (psychologist.isPresent()) {
+            psychologistRepository.deleteById(id);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public PsychologistDto getPsychologistById(Long id) {
+        Psychologist psychologist = psychologistRepository.findById(id)
+                .orElseThrow(() -> new PsychologistProcessingException(CANNOT_FIND_PSYCHOLOGIST + id));
+        return psychologistMapper.toDto(psychologist);
+    }
+
+    @Transactional
+    @Override
+    public PsychologistDto updatePsychologist(PsychologistDto psychologistDto) {
+        Psychologist psychologistToBeUpdated = psychologistRepository.findById(psychologistDto.getId())
+                .orElseThrow(() -> new PsychologistProcessingException(CANNOT_FIND_PSYCHOLOGIST));
+
+        if (psychologistDto.getAge() >=18) {
+            psychologistToBeUpdated.setAge(psychologistDto.getAge());
+        }
+
+        if (psychologistDto.getEducation() != null) {
+            psychologistToBeUpdated.setEducation(psychologistDto.getEducation());
+        }
+
+        if (psychologistDto.getEmail() != null) {
+            psychologistToBeUpdated.setEmail(psychologistDto.getEmail());
+        }
+
+        if (psychologistDto.getFirstName() != null) {
+            psychologistToBeUpdated.setFirstName(psychologistDto.getFirstName());
+        }
+
+        if (psychologistDto.getLastName() != null) {
+            psychologistToBeUpdated.setLastName(psychologistDto.getLastName());
+        }
+
+        if (psychologistDto.getAvatar() != null) {
+            psychologistToBeUpdated.setAvatar(psychologistToBeUpdated.getAvatar());
+        }
+
+        if (psychologistDto.getGender() != null) {
+            psychologistToBeUpdated.setGender(psychologistDto.getGender());
+        }
+
+        if (psychologistDto.getLicense() != null) {
+            psychologistToBeUpdated.setLicense(psychologistDto.getLicense());
+        }
+
+        if (psychologistDto.getQualification() != null) {
+            psychologistToBeUpdated.setQualification(psychologistDto.getQualification());
+        }
+
+        return psychologistMapper.toDto(psychologistRepository.save(psychologistToBeUpdated));
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<PsychologistDto> getAllPsychologistsPaginated(int pageNum, int pageSize) {
+        Pageable pageable = createPageRequest(pageNum, pageSize);
+        return psychologistRepository.findAll(pageable).map(psychologistMapper::toDto);
+    }
+
+    @Transactional
+    @Override
+    public Page<PsychologistDto> searchPsychologist(SearchRequest request) {
+        SearchSpecification<Psychologist> specification = new SearchSpecification<>(request);
+        Pageable pageable = SearchSpecification.getPageable(request.getPage(), request.getSize());
+        return psychologistRepository.findAll(specification, pageable).map(psychologistMapper::toDto);
+    }
+
+    private PageRequest createPageRequest(int pageNum, int pageSize) {
+        return PageRequest.of(pageNum - 1, pageSize, Sort.by("id").descending());
     }
 
 }

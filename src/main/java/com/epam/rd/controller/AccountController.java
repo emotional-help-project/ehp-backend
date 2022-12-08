@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -25,7 +24,6 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api/account")
 @RequiredArgsConstructor
-@Validated
 public class AccountController {
 
     private final ResponseErrorValidation responseErrorValidation;
