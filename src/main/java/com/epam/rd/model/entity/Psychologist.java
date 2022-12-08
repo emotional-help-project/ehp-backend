@@ -26,6 +26,8 @@ public class Psychologist {
     @Column(nullable = false, unique = true)
     private String email;
 
+    private String avatar;
+
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
