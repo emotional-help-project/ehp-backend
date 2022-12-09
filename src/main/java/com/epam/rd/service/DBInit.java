@@ -1,5 +1,6 @@
 package com.epam.rd.service;
 
+import com.epam.rd.exceptions.UserExistException;
 import com.epam.rd.model.entity.User;
 import com.epam.rd.model.enumerations.Gender;
 import com.epam.rd.model.enumerations.URole;
@@ -20,17 +21,20 @@ public class DBInit implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
+        if (userRepository.countUsersByRoleLike(URole.ADMIN)<1) {
+            User user = new User();
+            user.setFirstName("Admin");
+            user.setLastName("Admin Emotional");
+            user.setAge(25);
+            user.setGender(Gender.MALE);
+            user.setEmail("djavistdev@mail.ru");
+            user.getRoles().add(URole.ADMIN);
+            user.setRole(URole.ADMIN);
+            user.setPassword(passwordEncoder.encode("Star19!("));
+            userRepository.save(user);
 
-        User user = new User();
-        user.setFirstName("Admin");
-        user.setLastName("Admin Emotional");
-        user.setAge(25);
-        user.setGender(Gender.MALE);
-        user.setEmail("djavistdev@mail.ru");
-        user.getRoles().add(URole.ADMIN);
-        user.setRole(URole.ADMIN);
-        user.setPassword(passwordEncoder.encode("Star19!("));
-        userRepository.save(user);
+        }
+
 
     }
 
