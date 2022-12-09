@@ -246,8 +246,9 @@ public class UserServiceImpl implements UserService {
 
     public void updatePassword(User user, String newPassword) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        //TODO Password need to encode but  temporarly  I send without encode
         String encodeNewPassword = bCryptPasswordEncoder.encode(newPassword);
-        user.setPassword(encodeNewPassword);
+        user.setPassword(newPassword);
         user.setResetPasswordToken(null);
         userRepository.save(user);
     }
