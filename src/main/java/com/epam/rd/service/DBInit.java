@@ -20,19 +20,17 @@ public class DBInit implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        if (userRepository.findAll().isEmpty()) {
-            User user = new User();
-            user.setFirstName("Admin");
-            user.setLastName("Admin Emotional");
-            user.setAge(25);
-            user.setGender(Gender.MALE);
-            user.setEmail("djavistdev@mail.ru");
-            user.getRoles().add(URole.ADMIN);
-            user.setRole(URole.ADMIN);
-            user.setPassword(passwordEncoder.encode("Star19!("));
-            userRepository.save(user);
 
-        }
+        User user = new User();
+        user.setFirstName("Admin");
+        user.setLastName("Admin Emotional");
+        user.setAge(25);
+        user.setGender(Gender.MALE);
+        user.setEmail("djavistdev@mail.ru");
+        user.getRoles().add(URole.ADMIN);
+        user.setRole(URole.ADMIN);
+        user.setPassword(passwordEncoder.encode("Star19!("));
+        userRepository.save(user);
 
     }
 
