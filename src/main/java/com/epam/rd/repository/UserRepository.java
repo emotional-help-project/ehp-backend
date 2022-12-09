@@ -17,7 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Optional<User> findByEmail(String username);
     public User findByResetPasswordToken(String token);
     int countUsersByRoleLike(URole role);
-//    @Query("SELECT count(role) FROM users where role like'ADMIN'")
-//    String findAdminRole();
+
 
 }
