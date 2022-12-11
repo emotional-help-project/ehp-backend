@@ -34,27 +34,5 @@ public class BaseController <ENTITY> {
         return ResponseEntity.notFound().build();
     }
 
-    @PostMapping()
-    public ResponseEntity<?> create(@RequestBody ENTITY entity) {
-        try {
-            return new ResponseEntity<>(commonService.create(entity), HttpStatus.CREATED);
-        } catch (Exception x) {
-            return ResponseEntity.badRequest().body(new ApiException(HttpStatus.BAD_REQUEST, x.getMessage(), ""));
-        }
-
-    }
-
-    @PutMapping
-    public ResponseEntity<ENTITY> update(@RequestBody ENTITY entity) {
-        return new ResponseEntity<>(commonService.update(entity), HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ENTITY> delete(@PathVariable Long id) {
-        if (commonService.delete(id)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.badRequest().build();
-    }
 
 }
