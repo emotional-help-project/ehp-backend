@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/courses")
@@ -19,27 +17,9 @@ public class CourseController {
 
     private final CourseService courseService;
 
-    @PostMapping
-    public ResponseEntity<?> createCourse(@RequestBody CourseDto courseDto) {
-        return ResponseEntity.ok(courseService.createCourse(courseDto));
-
-    }
-
-    @PutMapping
-    public ResponseEntity<CourseDto> updateCourse(@RequestBody CourseDto courseDto) {
-        return ResponseEntity.ok(courseService.updateCourse(courseDto));
-    }
-
     @GetMapping(value = "/{id}")
     public ResponseEntity<CourseDto> getCourseById(@PathVariable Long id) {
         return ResponseEntity.ok(courseService.getCourseById(id));
-    }
-
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCourseById(@PathVariable Long id) {
-        courseService.deleteCourse(id);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/page")
