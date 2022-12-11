@@ -255,6 +255,27 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         return new UserEmotionStatisticsResponse().setEmotionStatistics(emotionStatistics);
     }
 
+    @Transactional
+    @Override
+    public List<TestShortDetailsResponse> getTestsFinishedByUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserProcessingException(CANNOT_FIND_USER + userId));
+
+        List<TestShortDetailsResponse> testsFinishedByUser = new ArrayList<>();
+        List<Session> finishedSessionsByUser = sessionRepository.findAllByUserAndFinished(user, true);
+
+        finishedSessionsByUser.stream().map(Session::getTest).distinct()
+                .forEach(test -> testsFinishedByUser.add(
+                        new TestShortDetailsResponse()
+                                .setTestId(test.getId())
+                                .setTestTitle(test.getTitle())
+                                .setImageUrl(test.getImageUrl())
+                ));
+
+        return testsFinishedByUser;
+    }
+
+
     private List<AnswerDto> getUsersAllAnswersForTestBySession(SessionDto session) {
 
         List<UserAnswersDto> userAnswersDtoList =

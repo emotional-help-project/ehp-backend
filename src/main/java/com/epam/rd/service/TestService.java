@@ -28,4 +28,6 @@ public interface TestService extends CommonService<Test, Long> {
     EmotionMapResponse getEmotionMapByTest(Long userId, Long testId);
 
     UserEmotionStatisticsResponse getUserEmotionStatistics(Long id);
+
+    List<TestShortDetailsResponse> getTestsFinishedByUser(Long userId);
 }

@@ -17,7 +17,8 @@ public class CourseController {
 
     private final CourseService courseService;
 
-    @GetMapping(value = "/{id}")
+
+   @GetMapping(value = "/{id}")
     public ResponseEntity<CourseDto> getCourseById(@PathVariable Long id) {
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
@@ -38,4 +39,9 @@ public class CourseController {
         return courseService.searchCourse(request);
     }
 
+    @PostMapping("/{id}/book")
+    public ResponseEntity<?> bookCourse(@PathVariable Long id,
+                                        @RequestParam Long userId) {
+        return ResponseEntity.ok(courseService.bookCourseForUser(id, userId));
+    }
 }
