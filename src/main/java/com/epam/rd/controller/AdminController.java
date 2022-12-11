@@ -8,6 +8,7 @@ import com.epam.rd.model.entity.*;
 import com.epam.rd.payload.request.AdviceAdminRequest;
 import com.epam.rd.payload.request.QuestionAnswerAdminRequest;
 import com.epam.rd.service.*;
+import com.epam.rd.service.impl.*;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,15 +25,15 @@ public class AdminController {
     private AdminService adminService;
     private PsychologistService psychologistService;
     private CourseService courseService;
-    private AnswerService answerService;
-    private LinkService linkService;
-    private QuestionService questionService;
-    private TestService testService;
-    private TestTypeService typeService;
+    private AnswerServiceImpl answerService;
+    private LinkServiceImpl linkService;
+    private QuestionServiceImpl questionService;
+    private TestServiceImpl testService;
+    private TestTypeServiceImpl typeService;
     private UserService userService;
 
 
-    @PostMapping("/test")
+    @PostMapping("/test-add")
     public ResponseEntity<?> addQuestionAnswersForTest(@RequestBody QuestionAnswerAdminRequest request) {
         return new ResponseEntity<>(adminService.addQuestionAnswersForTest(request), HttpStatus.CREATED);
     }
