@@ -31,6 +31,9 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private String password;
+    @Column(name = "reset_password_token", length = 50)
+    private String resetPasswordToken;
+
 
     @Enumerated(EnumType.STRING)
     private Gender gender;

@@ -25,7 +25,7 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping("check/{email}")
+    @GetMapping("/check/{email}")
     public ResponseEntity<Boolean> checkIfUserExistByEmail(@PathVariable(name = "email") String email) {
         return ResponseEntity.ok(userService.isUserExistByEmail(email));
     }

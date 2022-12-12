@@ -1,10 +1,11 @@
 package com.epam.rd.service.impl;
 
+import com.epam.rd.exceptions.UserExistException;
+import com.epam.rd.exceptions.UserNotFoundException;
 import com.epam.rd.exceptions.UserProcessingException;
 import com.epam.rd.model.dto.UserDto;
 import com.epam.rd.model.entity.User;
 import com.epam.rd.model.enumerations.URole;
-import com.epam.rd.exceptions.UserExistException;
 import com.epam.rd.model.mapper.UserMapper;
 import com.epam.rd.model.search.SearchSpecification;
 import com.epam.rd.payload.request.*;
@@ -14,17 +15,20 @@ import com.epam.rd.repository.UserRepository;
 import com.epam.rd.security.JWTTokenProvider;
 import com.epam.rd.service.UserService;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 @Log4j2
 @Service
@@ -47,6 +52,7 @@ public class UserServiceImpl implements UserService {
     private final JWTTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
+
 
     @Transactional
     @Override
@@ -231,4 +237,47 @@ public class UserServiceImpl implements UserService {
     private PageRequest createPageRequest(int pageNum, int pageSize) {
         return PageRequest.of(pageNum - 1, pageSize, Sort.by("id").descending());
     }
+
+    @Override
+    public void updateResetPassword(String token, String email) throws UserNotFoundException {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            user.get().setResetPasswordToken(token);
+            userRepository.save(user.get());
+        } else
+            throw new UserNotFoundException("Couldn't find any user with email " + email);
+    }
+
+    @Override
+    public User get(String resetPasswordToken) {
+        return userRepository.findByResetPasswordToken(resetPasswordToken);
+    }
+
+    public void updatePassword(User user, String newPassword) {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        //TODO Password need to encode but  temporarly  I send without encode
+        String encodeNewPassword = bCryptPasswordEncoder.encode(newPassword);
+        user.setPassword(newPassword);
+        user.setResetPasswordToken(null);
+        userRepository.save(user);
+    }
+
+    @Bean
+    public JavaMailSender getJavaMailSender() {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost("smtp.gmail.com");
+        mailSender.setPort(587);
+
+        mailSender.setUsername("airusteamaua@gmail.com");
+        mailSender.setPassword("sawpnylppueiqsnv");
+
+        Properties props = mailSender.getJavaMailProperties();
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.debug", "true");
+
+        return mailSender;
+    }
+
 }
