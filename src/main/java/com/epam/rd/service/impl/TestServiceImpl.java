@@ -323,8 +323,10 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         List<Question> allQuestionsOfTest = questionRepository.findAllByTest(test);
 
         for (Question question : allQuestionsOfTest) {
-            if (userFinalAnswersForTest.stream().map(AnswerDto::getQuestion)
-                    .noneMatch(userQuestion -> userQuestion.equals(question))) {
+            if (!question.getMultipleAnswers() &&
+                    userFinalAnswersForTest.stream().map(AnswerDto::getQuestion)
+                            .noneMatch(userQuestion -> userQuestion.equals(question)
+                            )) {
                 return false;
             }
         }
