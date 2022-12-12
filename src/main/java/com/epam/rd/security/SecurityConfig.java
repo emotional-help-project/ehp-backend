@@ -97,10 +97,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:4200");
+
         config.addAllowedOrigin("http://localhost:63033");
         config.addAllowedOrigin("http://192.168.100.42:4200");
         config.addAllowedOrigin("http://127.0.0.1:9090");
         config.addAllowedOrigin("http://127.0.0.1:9090/");
+        config.addAllowedOrigin("http://localhost:4201");
+        config.addAllowedOrigin("http://localhost:5501");
+        config.addAllowedOrigin("http://localhost:5502");
+        config.addAllowedOrigin("http://5.58.12.93");
+        config.addAllowedOrigin("http://5.58.12.93:8095");
+        config.addAllowedOrigin("http://5.58.12.93:9090");
+        config.addAllowedOrigin("http://5.58.12.93:8080");
+        config.addAllowedOrigin("http://localhost:4200");
+
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
