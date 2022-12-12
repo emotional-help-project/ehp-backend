@@ -14,7 +14,7 @@ import com.epam.rd.payload.request.SignupRequest;
 import com.epam.rd.payload.request.UpdateUserProfileRequest;
 import com.epam.rd.payload.response.JWTTokenSuccessResponse;
 import com.epam.rd.repository.UserRepository;
-import com.epam.rd.security.JWTTokenProvider;
+import com.epam.rd.security.JwtUtil;
 import com.epam.rd.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JWTTokenProvider jwtTokenProvider;
+    private final JwtUtil jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
 

@@ -22,14 +22,15 @@ public class ResetPasswordController {
     private UserService userService;
     @Autowired
     private JavaMailSender mailSender;
-//Genreate token by email or Token to Send email
+
+    //Genreate token by email or Token to Send email
     @PostMapping()
     public String processForgetPassword(@RequestParam(name = "email") String email, HttpServletRequest request) {
         String token = RandomString.make(50);
         System.out.println(email + "   \n" + token);
         try {
             userService.updateResetPassword(token, email);
-            String resetPasswordLink = request.getRequestURL().toString() + "/reset?token=" + token;
+            String resetPasswordLink = "http://5.58.12.93:9090" + "/reset?token=" + token;
             sendEmail(email, resetPasswordLink);
             System.out.println(resetPasswordLink);
         } catch (UserNotFoundException | MessagingException | UnsupportedEncodingException e) {
@@ -37,12 +38,14 @@ public class ResetPasswordController {
         }
         return token;
     }
-//GetUserbytoken
+
+    //GetUserbytoken
     @GetMapping()
     public ResponseEntity<User> findByToken(@RequestParam(value = "token") String token) {
         return ResponseEntity.ok(userService.get(token));
     }
-//
+
+    //
     @GetMapping("/reset")
     public ResponseEntity<User> resetPasswordForm(@RequestParam(name = "token") String token,
                                                   HttpServletRequest request) throws Exception {
@@ -54,23 +57,23 @@ public class ResetPasswordController {
 //        userService.updatePassword(user, password);
         return ResponseEntity.ok(user);
     }
-/**
- * update password for new
- */
+
+    /**
+     * update password for new
+     */
     @PostMapping("/reset")
     public ResponseEntity<User> resetPassword(@RequestParam(name = "token") String token,
                                               @RequestParam(name = "password") String password,
                                               HttpServletRequest request) throws Exception {
-        User user=userService.get(token);
+        User user = userService.get(token);
         if (user == null) {
             throw new Exception("Invalid Token");
-        }
-        else {
-            userService.updatePassword(user,password);
+        } else {
+            userService.updatePassword(user, password);
             throw new Exception("Successfully updated ! ");
         }
 //        return ResponseEntity.ok().build();
-                    }
+    }
 
     public void sendEmail(String email, String resetPasswordLink) throws MessagingException, UnsupportedEncodingException {
         MimeMessage message = mailSender.createMimeMessage();
