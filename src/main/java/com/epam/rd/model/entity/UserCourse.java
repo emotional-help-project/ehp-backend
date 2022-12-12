@@ -5,17 +5,19 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
-@Entity(name = "advice_links")
+@Entity(name = "user_course")
 @Data
 @Accessors(chain = true)
-public class AdviceLink {
+public class UserCourse {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    private Advice advice;
+    private User user;
+
     @ManyToOne
-    private Link link;
+    private Course course;
+
 }

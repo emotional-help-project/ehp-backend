@@ -1,6 +1,8 @@
 package com.epam.rd.service;
 
+import com.epam.rd.exceptions.UserNotFoundException;
 import com.epam.rd.model.dto.UserDto;
+import com.epam.rd.model.entity.User;
 import com.epam.rd.payload.request.LoginRequest;
 import com.epam.rd.payload.request.SearchRequest;
 import com.epam.rd.payload.request.SignupRequest;
@@ -38,4 +40,10 @@ public interface UserService {
     Page<UserDto> searchUser(SearchRequest request);
 
     UserDto updateUserProfile(UpdateUserProfileRequest updateUserProfile);
+
+    User get(String resetPasswordToken);
+
+    void updateResetPassword(String token, String email) throws UserNotFoundException;
+
+    void updatePassword(User user, String newPassword);
 }

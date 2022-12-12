@@ -1,14 +1,12 @@
 package com.epam.rd.model.entity;
 
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
-@Entity(name = "advice_links")
+@Entity(name = "advice_course")
 @Data
-@Accessors(chain = true)
-public class AdviceLink {
+public class AdviceCourse {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,5 +15,5 @@ public class AdviceLink {
     @ManyToOne
     private Advice advice;
     @ManyToOne
-    private Link link;
+    private Course course;
 }
