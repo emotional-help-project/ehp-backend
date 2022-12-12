@@ -8,6 +8,7 @@ import com.epam.rd.payload.request.SearchRequest;
 import com.epam.rd.payload.request.SignupRequest;
 import com.epam.rd.payload.request.UpdateUserProfileRequest;
 import com.epam.rd.payload.response.JWTTokenSuccessResponse;
+import com.epam.rd.payload.response.UpdateUserPasswordResponse;
 import org.springframework.data.domain.Page;
 
 import java.security.Principal;
@@ -40,6 +41,8 @@ public interface UserService {
     Page<UserDto> searchUser(SearchRequest request);
 
     UserDto updateUserProfile(UpdateUserProfileRequest updateUserProfile);
+
+    UpdateUserPasswordResponse updateUserPassword(UpdateUserPasswordRequest updateUserPasswordRequest);
 
     User get(String resetPasswordToken);
 
