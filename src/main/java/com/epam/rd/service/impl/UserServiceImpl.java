@@ -211,7 +211,7 @@ public class UserServiceImpl implements UserService {
             updatedUser.setGender(updateUserProfile.getGender());
         }
 
-        if (updateUserProfile.getAge() > 0) {
+        if (updateUserProfile.getAge() != null) {
             updatedUser.setAge(updateUserProfile.getAge());
         }
 
