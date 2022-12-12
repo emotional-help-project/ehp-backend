@@ -56,8 +56,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/forgot/**").permitAll()
                 .antMatchers("/api/admin/**").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.GET, "/api/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
-                .antMatchers(HttpMethod.POST, "/api/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
-                .antMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/account").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/**").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/**").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.DELETE, "/api/**").hasAnyAuthority(URole.ADMIN.toString())
+                //courses
+                .antMatchers(HttpMethod.DELETE, "/api/courses/**").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/courses/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/courses/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                //psychologic
+                .antMatchers(HttpMethod.POST, "/api/psychologists/search").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                //test
+                .antMatchers(HttpMethod.POST, "/api/tests/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                //users
+                .antMatchers("/api/users/**").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers("/api/user/profile/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+
 
                 .anyRequest().authenticated()
                 .and().exceptionHandling()
