@@ -7,11 +7,9 @@ import com.epam.rd.model.enumerations.URole;
 import com.epam.rd.exceptions.UserExistException;
 import com.epam.rd.model.mapper.UserMapper;
 import com.epam.rd.model.search.SearchSpecification;
-import com.epam.rd.payload.request.LoginRequest;
-import com.epam.rd.payload.request.SearchRequest;
-import com.epam.rd.payload.request.SignupRequest;
-import com.epam.rd.payload.request.UpdateUserProfileRequest;
+import com.epam.rd.payload.request.*;
 import com.epam.rd.payload.response.JWTTokenSuccessResponse;
+import com.epam.rd.payload.response.UpdateUserPasswordResponse;
 import com.epam.rd.repository.UserRepository;
 import com.epam.rd.security.JWTTokenProvider;
 import com.epam.rd.service.UserService;
@@ -41,7 +39,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private static final String USER_DOESNT_EXIST_BY_EMAIL = "A user with this email does not exist";
-    private static final String USER_DOESNT_EXIST_BY_ID = "A user with this ID does not exist";
+    private static final String CANNOT_FIND_USER_BY_ID = "Cannot find user with ID=";
     private static final String UPDATE_EXCEPTION = "Can't update non existing data";
 
     private final UserRepository userRepository;
@@ -148,7 +146,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_ID));
+                .orElseThrow(() -> new UserProcessingException(CANNOT_FIND_USER_BY_ID + id));
         return userMapper.toDto(user);
     }
 
@@ -159,7 +157,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsById(userDto.getId())) {
             User userToBeUpdated = userMapper.toEntity(userDto);
             userToBeUpdated.setPassword(userRepository.findById(userDto.getId())
-                    .orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_ID)).getPassword());
+                    .orElseThrow(() -> new UserProcessingException(CANNOT_FIND_USER_BY_ID + userDto.getId())).getPassword());
             user = userRepository.save(userToBeUpdated);
         } else {
             log.error(UPDATE_EXCEPTION);
@@ -188,7 +186,7 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUserProfile(UpdateUserProfileRequest updateUserProfile) {
 
         User updatedUser = userRepository.findById(updateUserProfile.getId())
-                .orElseThrow(() -> new UserProcessingException(USER_DOESNT_EXIST_BY_ID));
+                .orElseThrow(() -> new UserProcessingException(CANNOT_FIND_USER_BY_ID + updateUserProfile.getId()));
 
         if (updateUserProfile.getFirstName() != null) {
             updatedUser.setFirstName(updateUserProfile.getFirstName());
@@ -202,11 +200,6 @@ public class UserServiceImpl implements UserService {
             updatedUser.setEmail(updateUserProfile.getEmail());
         }
 
-        if (updateUserProfile.getNewPassword() != null) {
-            final String encodedPassword = passwordEncoder.encode(updateUserProfile.getNewPassword());
-            updatedUser.setPassword(encodedPassword);
-        }
-
         if (updateUserProfile.getGender() != null) {
             updatedUser.setGender(updateUserProfile.getGender());
         }
@@ -217,6 +210,22 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(updatedUser);
         return userMapper.toDto(updatedUser);
+    }
+
+    @Override
+    public UpdateUserPasswordResponse updateUserPassword(UpdateUserPasswordRequest updateUserPasswordRequest) {
+
+        User updatedUser = userRepository.findById(updateUserPasswordRequest.getUserId())
+                .orElseThrow(() -> new UserProcessingException(CANNOT_FIND_USER_BY_ID + updateUserPasswordRequest.getUserId()));
+
+        if (updateUserPasswordRequest.getNewPassword() != null) {
+            final String encodedPassword = passwordEncoder.encode(updateUserPasswordRequest.getNewPassword());
+            updatedUser.setPassword(encodedPassword);
+        }
+
+        return new UpdateUserPasswordResponse()
+                .setUserId(updatedUser.getId())
+                .setNewPassword(updatedUser.getPassword());
     }
 
     private PageRequest createPageRequest(int pageNum, int pageSize) {
