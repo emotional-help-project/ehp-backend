@@ -2,9 +2,9 @@ package com.epam.rd.security;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
- import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-  import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -47,12 +47,12 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
 
-private String getJWTFromRequest(HttpServletRequest request) {
-    String bearToken = request.getHeader("Authorization");
-    if (StringUtils.hasText(bearToken) && bearToken.startsWith("Bearer ")) {
-        return bearToken.split(" ")[1];
+    private String getJWTFromRequest(HttpServletRequest request) {
+        String bearToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearToken) && bearToken.startsWith("Bearer ")) {
+            return bearToken.split(" ")[1];
+        }
+        return null;
     }
-    return null;
-}
 
 }
