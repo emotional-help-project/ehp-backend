@@ -75,7 +75,7 @@ public class ResetPasswordController {
 //        return ResponseEntity.ok().build();
     }
 
-    public void sendEmail(String email, String resetPasswordLink) throws MessagingException, UnsupportedEncodingException {
+    private void sendEmail(String email, String resetPasswordLink) throws MessagingException, UnsupportedEncodingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message);
         messageHelper.setFrom("contact@help.com", "Emotional Help Support");
