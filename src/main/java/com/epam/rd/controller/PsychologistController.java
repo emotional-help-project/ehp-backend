@@ -60,7 +60,7 @@ public class PsychologistController {
 
     @GetMapping("/page")
     public Page<PsychologistDto> getAllPsychologistsPaginated(@RequestParam(required = false, defaultValue = "1") int pageNum,
-                                                  @RequestParam(required = false, defaultValue = "5") int pageSize) {
+                                                              @RequestParam(required = false, defaultValue = "5") int pageSize) {
         return psychologistService.getAllPsychologistsPaginated(pageNum, pageSize);
     }
 
