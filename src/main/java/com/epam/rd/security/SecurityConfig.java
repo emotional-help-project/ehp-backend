@@ -70,7 +70,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //psychologic
                 .antMatchers(HttpMethod.POST, "/api/psychologists/search").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 //test
-//                .antMatchers("/api/tests/test/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/tests/test/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 .antMatchers(HttpMethod.GET, "/api/tests/test/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 .antMatchers(HttpMethod.PUT, "/api/tests/test/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
@@ -78,7 +77,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //users
                 .antMatchers("/api/users/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 .antMatchers("/api/user/profile/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
-//                .antMatchers(HttpMethod.GET,"/api/users/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
 
 
                 .anyRequest().authenticated()
