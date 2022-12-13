@@ -6,6 +6,7 @@ import com.epam.rd.model.entity.User;
 import com.epam.rd.payload.request.*;
 import com.epam.rd.payload.response.JWTTokenSuccessResponse;
 import com.epam.rd.payload.response.UpdateUserPasswordResponse;
+import com.epam.rd.payload.request.UpdateUserPasswordRequest;
 import org.springframework.data.domain.Page;
 
 import java.security.Principal;

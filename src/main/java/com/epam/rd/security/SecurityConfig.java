@@ -53,11 +53,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/account/signin").permitAll()
                 .antMatchers("/api/account/signup").permitAll()
-                .antMatchers("/api/forgot/**").permitAll()
+//                .antMatchers("/api/**").permitAll()
                 .antMatchers("/api/admin/**").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.GET, "/api/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 .antMatchers(HttpMethod.GET, "/api/account").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.POST, "/api/**").hasAnyAuthority(URole.ADMIN.toString())
+//                .antMatchers(HttpMethod.POST, "/api/**").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/testTypes/**").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/answers/**").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/appoint/**").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.PUT, "/api/**").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.DELETE, "/api/**").hasAnyAuthority(URole.ADMIN.toString())
                 //courses
@@ -67,10 +70,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //psychologic
                 .antMatchers(HttpMethod.POST, "/api/psychologists/search").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 //test
-                .antMatchers(HttpMethod.POST, "/api/tests/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+//                .antMatchers("/api/tests/test/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/tests/test/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/tests/test/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/tests/test/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.DELETE, "/api/tests/test/**").hasAnyAuthority( URole.ADMIN.toString())
                 //users
-                .antMatchers("/api/users/**").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers("/api/users/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 .antMatchers("/api/user/profile/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+//                .antMatchers(HttpMethod.GET,"/api/users/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
 
 
                 .anyRequest().authenticated()
