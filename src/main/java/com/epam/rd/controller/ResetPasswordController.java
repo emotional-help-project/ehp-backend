@@ -5,6 +5,7 @@ import com.epam.rd.model.entity.User;
 import com.epam.rd.service.UserService;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 
 @RestController
@@ -23,20 +23,30 @@ public class ResetPasswordController {
     @Autowired
     private JavaMailSender mailSender;
 
+    private String link;
+
+    @Value("${link}")
+    public void setPath(String path) {
+        this.link = path;
+    }
+
+
     //Genreate token by email or Token to Send email
     @PostMapping()
-    public String processForgetPassword(@RequestParam(name = "email") String email, HttpServletRequest request) {
+    public String processForgetPassword(@RequestParam(name = "email") String email) {
         String token = RandomString.make(50);
         System.out.println(email + "   \n" + token);
         try {
             userService.updateResetPassword(token, email);
-            String resetPasswordLink = "http://5.58.12.93:9090" + "/reset?token=" + token;
+            String resetPasswordLink = link + "/reset?token=" + token;
+            System.out.println(resetPasswordLink);
             sendEmail(email, resetPasswordLink);
             System.out.println(resetPasswordLink);
         } catch (UserNotFoundException | MessagingException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
         return token;
+
     }
 
     //GetUserbytoken
@@ -47,8 +57,7 @@ public class ResetPasswordController {
 
     //
     @GetMapping("/reset")
-    public ResponseEntity<User> resetPasswordForm(@RequestParam(name = "token") String token,
-                                                  HttpServletRequest request) throws Exception {
+    public ResponseEntity<User> resetPasswordForm(@RequestParam(name = "token") String token) throws Exception {
         User user = userService.get(token);
         if (user == null) {
             throw new Exception("Invalid Token");
@@ -63,8 +72,7 @@ public class ResetPasswordController {
      */
     @PostMapping("/reset")
     public ResponseEntity<User> resetPassword(@RequestParam(name = "token") String token,
-                                              @RequestParam(name = "password") String password,
-                                              HttpServletRequest request) throws Exception {
+                                              @RequestParam(name = "password") String password) throws Exception {
         User user = userService.get(token);
         if (user == null) {
             throw new Exception("Invalid Token");
