@@ -21,8 +21,7 @@ public class ResetPasswordController {
     @Autowired
     private UserService userService;
     @Autowired
-    private JavaMailSender mailSender;
-
+    JavaMailSender mailSender;
     private String link;
 
     @Value("${link}")
@@ -30,8 +29,9 @@ public class ResetPasswordController {
         this.link = path;
     }
 
-
-    //Genreate token by email or Token to Send email
+    /**
+     * Genreate token by email or Token to Send email
+     */
     @PostMapping()
     public String processForgetPassword(@RequestParam(name = "email") String email) {
         String token = RandomString.make(50);
@@ -46,23 +46,23 @@ public class ResetPasswordController {
             throw new RuntimeException(e);
         }
         return token;
-
     }
 
-    //GetUserbytoken
+    /**
+     * Get User by token
+     */
+
     @GetMapping()
     public ResponseEntity<User> findByToken(@RequestParam(value = "token") String token) {
         return ResponseEntity.ok(userService.get(token));
     }
 
-    //
     @GetMapping("/reset")
     public ResponseEntity<User> resetPasswordForm(@RequestParam(name = "token") String token) throws Exception {
         User user = userService.get(token);
         if (user == null) {
             throw new Exception("Invalid Token");
         }
-
 //        userService.updatePassword(user, password);
         return ResponseEntity.ok(user);
     }
@@ -80,10 +80,10 @@ public class ResetPasswordController {
             userService.updatePassword(user, password);
             throw new Exception("Successfully updated ! ");
         }
-//        return ResponseEntity.ok().build();
+
     }
 
-    private void sendEmail(String email, String resetPasswordLink) throws MessagingException, UnsupportedEncodingException {
+    public void sendEmail(String email, String resetPasswordLink) throws MessagingException, UnsupportedEncodingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message);
         messageHelper.setFrom("contact@help.com", "Emotional Help Support");
