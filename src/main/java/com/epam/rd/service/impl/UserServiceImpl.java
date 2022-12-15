@@ -218,6 +218,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(updatedUser);
     }
 
+    @Transactional
     @Override
     public UpdateUserPasswordResponse updateUserPassword(UpdateUserPasswordRequest updateUserPasswordRequest) {
 
@@ -228,6 +229,8 @@ public class UserServiceImpl implements UserService {
             final String encodedPassword = passwordEncoder.encode(updateUserPasswordRequest.getNewPassword());
             updatedUser.setPassword(encodedPassword);
         }
+
+        userRepository.save(updatedUser);
 
         return new UpdateUserPasswordResponse()
                 .setUserId(updatedUser.getId())
