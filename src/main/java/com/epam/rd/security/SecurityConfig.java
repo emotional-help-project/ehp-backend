@@ -56,9 +56,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/account").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 .antMatchers("/").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/forgot").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/forgot/reset").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/forgot/reset-password").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/forgot").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/forgot/reset").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/forgot/reset-password").permitAll()
 
                 //Users
 
