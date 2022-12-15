@@ -87,10 +87,10 @@ public class ResetPasswordController {
         MimeMessageHelper messageHelper = new MimeMessageHelper(message);
         messageHelper.setFrom("contact@help.com", "Emotional Help Support");
         messageHelper.setTo(email);
-        String subject = "Her is  the link to reset your password";
+        String subject = "Emotional Help Password reset confirmation";
         String content = "<p>Hello</p>" +
-                "You have a request to recover your password <br>" +
-                "Click the link below to change your password:<br> " +
+                "There was recently a request to change the password on your account. <br>" +
+                "If you requested this password change, please click the link below to set a new password:<br> " +
                 "<a href=\"" + resetPasswordLink + "\">Change my password </a>";
         messageHelper.setSubject(subject);
         messageHelper.setText(content, true);
