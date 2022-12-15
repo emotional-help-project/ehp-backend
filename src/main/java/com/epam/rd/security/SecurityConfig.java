@@ -91,7 +91,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/courses").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.PUT, "/api/courses").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.DELETE, "/api/courses/{id}").hasAnyAuthority(URole.ADMIN.toString())
-                //TODO If  some courses need to home page this permission will be permitall
                 .antMatchers(HttpMethod.POST, "/api/courses/search").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
                 .antMatchers(HttpMethod.GET, "/api/courses/{id}").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/courses/page").permitAll()
@@ -140,6 +139,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/testTypes").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.PUT, "/api/testTypes").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.DELETE, "/api/testTypes/{id}").hasAnyAuthority(URole.ADMIN.toString())
+
+                //advice
+                .antMatchers(HttpMethod.DELETE, "/api/advice/{id}").hasAnyAuthority(URole.ADMIN.toString())
 
                 .anyRequest().authenticated()
                 .and().exceptionHandling()
