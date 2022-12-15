@@ -28,10 +28,9 @@ public class UserSpecial implements UserDetails {
     }
 
     public UserSpecial(User u) {
+        this.id = u.getId();
         this.email = u.getEmail();
         this.password = u.getPassword();
-
-
     }
 
     @Override
