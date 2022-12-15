@@ -94,7 +94,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/courses/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
                 .antMatchers(HttpMethod.GET, "/api/courses/page").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
                 //TODO If  some courses need to home page this permission will be permitall
-                .antMatchers(HttpMethod.GET, "/api/courses").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.GET, "/api/courses").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/courses/search").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
                 .antMatchers(HttpMethod.POST, "/api/courses/{id}/book").hasAnyAuthority(URole.ADMIN.toString())
                 //appointment
