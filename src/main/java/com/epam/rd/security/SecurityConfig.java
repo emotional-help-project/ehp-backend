@@ -56,9 +56,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/account").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 .antMatchers("/").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/forgot").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/forgot/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/forgot/reset-password").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/forgot").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/forgot/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/forgot/reset-password").permitAll()
 
                 //Users
 
@@ -91,11 +91,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/courses").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.PUT, "/api/courses").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.DELETE, "/api/courses/{id}").hasAnyAuthority(URole.ADMIN.toString())
+                //TODO If  some courses need to home page this permission will be permitall
+                .antMatchers(HttpMethod.POST, "/api/courses/search").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
                 .antMatchers(HttpMethod.GET, "/api/courses/{id}").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/courses/page").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/courses").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/courses/search").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/courses/{id}/book").hasAnyAuthority(URole.USER.toString())
+                .antMatchers(HttpMethod.POST, "/api/courses/{id}/book").hasAnyAuthority(URole.USER.toString(),URole.ADMIN.toString())
+
                 //appointment
                 .antMatchers(HttpMethod.POST, "/api/appointments/appoint").hasAnyAuthority(URole.ADMIN.toString())
                 //links

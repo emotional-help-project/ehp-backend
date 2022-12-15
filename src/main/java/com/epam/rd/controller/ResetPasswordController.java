@@ -38,7 +38,7 @@ public class ResetPasswordController {
         System.out.println(email + "   \n" + token);
         try {
             userService.updateResetPassword(token, email);
-            String resetPasswordLink = link + "/reset?token=" + token;
+            String resetPasswordLink = link + "/reset-password?token=" + token;
             System.out.println(resetPasswordLink);
             sendEmail(email, resetPasswordLink);
             System.out.println(resetPasswordLink);
@@ -57,7 +57,7 @@ public class ResetPasswordController {
         return ResponseEntity.ok(userService.get(token));
     }
 
-    @GetMapping("/reset")
+    @GetMapping("/reset-password")
     public ResponseEntity<User> resetPasswordForm(@RequestParam(name = "token") String token) throws Exception {
         User user = userService.get(token);
         if (user == null) {
@@ -70,7 +70,7 @@ public class ResetPasswordController {
     /**
      * update password for new
      */
-    @PostMapping("/reset")
+    @PostMapping("/reset-password")
     public ResponseEntity<User> resetPassword(@RequestParam(name = "token") String token,
                                               @RequestParam(name = "password") String password) throws Exception {
         User user = userService.get(token);

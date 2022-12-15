@@ -13,7 +13,7 @@ import java.io.Serializable;
 @MappedSuperclass
 @Data
 @NoArgsConstructor
-public class BaseEntity implements Serializable {
+public class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
