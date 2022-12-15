@@ -68,9 +68,12 @@ public class CourseServiceImpl implements CourseService {
         Course courseToBeUpdated = courseRepository.findById(courseDto.getId())
                 .orElseThrow(() -> new CourseProcessingException(CANNOT_FIND_COURSE));
 
+        if (courseDto.getTitle() != null) {
+            courseToBeUpdated.setTitle(courseDto.getTitle());
+        }
 
         if (courseDto.getDescription() != null) {
-            courseToBeUpdated.setDescription(courseToBeUpdated.getDescription());
+            courseToBeUpdated.setDescription(courseDto.getDescription());
         }
 
         if (courseDto.getPrice() != null && courseDto.getPrice().compareTo(BigDecimal.ZERO) > 0) {
