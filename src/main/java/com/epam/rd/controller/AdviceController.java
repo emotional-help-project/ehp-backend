@@ -1,5 +1,6 @@
 package com.epam.rd.controller;
 
+import com.epam.rd.payload.request.UpdateAdviceRequest;
 import com.epam.rd.service.AdviceService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,12 @@ public class AdviceController {
     public ResponseEntity<?> deleteAdvice(@PathVariable Long id) {
         adviceService.deleteAdvice(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/update")
+    public ResponseEntity<?> updateAdvice(@RequestBody UpdateAdviceRequest updateAdviceRequest) {
+
+        return ResponseEntity.ok(adviceService.updateAdvice(updateAdviceRequest));
     }
 
 }
