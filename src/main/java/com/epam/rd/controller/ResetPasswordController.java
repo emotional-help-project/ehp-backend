@@ -71,16 +71,15 @@ public class ResetPasswordController {
      * update password for new
      */
     @PostMapping("/reset-password")
-    public ResponseEntity<User> resetPassword(@RequestParam(name = "token") String token,
+    public ResponseEntity<?> resetPassword(@RequestParam(name = "token") String token,
                                               @RequestParam(name = "password") String password) throws Exception {
         User user = userService.get(token);
         if (user == null) {
             throw new Exception("Invalid Token");
         } else {
             userService.updatePassword(user, password);
-            throw new Exception("Successfully updated ! ");
         }
-
+        return ResponseEntity.noContent().build();
     }
 
     public void sendEmail(String email, String resetPasswordLink) throws MessagingException, UnsupportedEncodingException {
