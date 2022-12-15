@@ -33,7 +33,6 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
 
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCourseById(@PathVariable Long id) {
         courseService.deleteCourse(id);
