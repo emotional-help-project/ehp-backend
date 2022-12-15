@@ -1,5 +1,6 @@
 package com.epam.rd.security;
 
+import com.epam.rd.model.entity.User;
 import com.epam.rd.model.enumerations.URole;
 import com.epam.rd.repository.UserRepository;
 import io.jsonwebtoken.*;
@@ -46,6 +47,7 @@ public class JwtUtil {
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         Map<String, Object> claimsMap = new HashMap<>();
+        claimsMap.put("id", user.getId());
         claimsMap.put("username", user.getUsername());
         claimsMap.put("role", Collections.singletonList(role));
 

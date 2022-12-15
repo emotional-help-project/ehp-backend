@@ -30,7 +30,7 @@ public class ResetPasswordController {
     }
 
     /**
-     * Genreate token by email or Token to Send email
+     * Generate token by email or Token to Send email
      */
     @PostMapping()
     public String processForgetPassword(@RequestParam(name = "email") String email) {

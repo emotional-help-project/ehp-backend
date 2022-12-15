@@ -91,12 +91,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/courses").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.PUT, "/api/courses").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.DELETE, "/api/courses/{id}").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.GET, "/api/courses/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
-                .antMatchers(HttpMethod.GET, "/api/courses/page").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
                 //TODO If  some courses need to home page this permission will be permitall
-                .antMatchers(HttpMethod.GET, "/api/courses").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/courses/search").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
-                .antMatchers(HttpMethod.POST, "/api/courses/{id}/book").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/courses/{id}").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/courses/page").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/courses").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/courses/search").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/courses/{id}/book").hasAnyAuthority(URole.USER.toString(),URole.ADMIN.toString())
+
                 //appointment
                 .antMatchers(HttpMethod.POST, "/api/appointments/appoint").hasAnyAuthority(URole.ADMIN.toString())
                 //links
@@ -106,14 +108,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/api/links").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.DELETE, "/api/links/{id}").hasAnyAuthority(URole.ADMIN.toString())
                 //psychologic
-                .antMatchers(HttpMethod.POST, "/api/psychologists/search").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/psychologists/search").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/psychologists").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.PUT, "/api/psychologists").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.DELETE, "/api/psychologists/{id}").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.GET, "/api/psychologists/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.GET, "/api/psychologists/{id}").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/psychologists/available").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
-                .antMatchers(HttpMethod.GET, "/api/psychologists").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
-                .antMatchers(HttpMethod.GET, "/api/psychologists/page").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/psychologists").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/psychologists/page").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/psychologists/psy/{psychologistId}").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 //Question
                 .antMatchers(HttpMethod.GET, "/api/questions").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())

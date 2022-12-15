@@ -167,7 +167,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
 
     @Transactional
     @Override
-    public FinalizeTestResponse finalizeTest(Long sessionId) {
+    public Long calculateResult(Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new SessionProcessingException(CANNOT_FIND_SESSION + sessionId));
         SessionDto sessionDto = sessionMapper.toDto(session);
@@ -175,13 +175,22 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
 
         if (!checkIfAllQuestionsAreAnswered(sessionDto, userFinalAnswersForTest)) return null;
 
-        long userScore = calculateUserScore(userFinalAnswersForTest);
+        return calculateUserScore(userFinalAnswersForTest);
+    }
+
+    @Transactional
+    @Override
+    public FinalizeTestResponse finalizeTest(Long sessionId, Long userScore) {
+
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new SessionProcessingException(CANNOT_FIND_SESSION + sessionId));
+
         Advice advice = adviceRepository.findAdviceByUserScore(userScore)
                 .orElseThrow(() -> new AdviceProcessingException(CANNOT_FIND_ADVICE_FOR_USER_SCORE + userScore));
 
         finalizeAndSaveTestResult(userScore, advice, session);
 
-        updateSessionToFinished(sessionDto);
+        updateSessionToFinished(sessionMapper.toDto(session));
 
         return new FinalizeTestResponse()
                 .setAdviceDescription(advice.getTitle())

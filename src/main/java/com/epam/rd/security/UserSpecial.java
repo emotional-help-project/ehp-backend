@@ -15,6 +15,8 @@ import java.util.Set;
  * User details implementation removed by User class and implement  for this class
  */
 public class UserSpecial implements UserDetails {
+
+    private Long id;
     private String email;
     private String password;
     private boolean rememberMe;
@@ -26,10 +28,9 @@ public class UserSpecial implements UserDetails {
     }
 
     public UserSpecial(User u) {
+        this.id = u.getId();
         this.email = u.getEmail();
         this.password = u.getPassword();
-
-
     }
 
     @Override
@@ -81,6 +82,10 @@ public class UserSpecial implements UserDetails {
 
     public void setRememberMe(boolean rememberMe) {
         this.rememberMe = rememberMe;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Transactional
