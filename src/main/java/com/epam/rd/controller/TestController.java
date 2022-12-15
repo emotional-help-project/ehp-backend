@@ -1,5 +1,6 @@
 package com.epam.rd.controller;
 
+import com.epam.rd.exceptions.AdviceProcessingException;
 import com.epam.rd.exceptions.TestProcessingException;
 import com.epam.rd.payload.request.UserAnswersRequest;
 import com.epam.rd.model.entity.Test;
@@ -56,11 +57,20 @@ public class TestController extends BaseController<Test> {
             return ResponseEntity.badRequest()
                     .body(new TestProcessingException("Answers can not be submitted."));
         }
-        FinalizeTestResponse finalizeTestResponse = testService.finalizeTest(sessionId);
-        if (finalizeTestResponse == null) {
-            return ResponseEntity.badRequest()
-                    .body(new TestProcessingException("Not all questions are answered."));
+
+        Long userScore = testService.calculateResult(sessionId);
+
+        FinalizeTestResponse finalizeTestResponse;
+        try {
+            finalizeTestResponse = testService.finalizeTest(sessionId, userScore);
+            if (finalizeTestResponse == null) {
+                return ResponseEntity.badRequest()
+                        .body(new TestProcessingException("Not all questions are answered."));
+            }
+        } catch (AdviceProcessingException exception) {
+            return ResponseEntity.ok(userScore);
         }
+
         return ResponseEntity.ok(finalizeTestResponse);
     }
 
