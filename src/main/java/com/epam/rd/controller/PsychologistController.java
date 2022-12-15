@@ -51,7 +51,6 @@ public class PsychologistController {
         return ResponseEntity.ok(psychologistService.getPsychologistById(id));
     }
 
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePsychologistById(@PathVariable Long id) {
         psychologistService.deletePsychologist(id);
