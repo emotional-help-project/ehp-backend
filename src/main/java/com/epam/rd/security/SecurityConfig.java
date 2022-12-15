@@ -56,9 +56,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/account").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 .antMatchers("/").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/forgot").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/forgot/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/forgot/reset").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/forgot").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/forgot/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/forgot/reset").permitAll()
 
                 //Users
 
@@ -88,15 +88,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/api/answers").hasAnyAuthority(URole.ADMIN.toString())
                 .antMatchers(HttpMethod.DELETE, "/api/answers/{id}").hasAnyAuthority(URole.ADMIN.toString())
                 //course
-                .antMatchers(HttpMethod.POST, "/api/course").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.PUT, "/api/course").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.DELETE, "/api/course/{id}").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.GET, "/api/course/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
-                .antMatchers(HttpMethod.GET, "/api/course/page").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.POST, "/api/courses").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/courses").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.DELETE, "/api/courses/{id}").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/courses/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.GET, "/api/courses/page").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
                 //TODO If  some courses need to home page this permission will be permitall
-                .antMatchers(HttpMethod.GET, "/api/course").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
-                .antMatchers(HttpMethod.POST, "/api/course/search").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
-                .antMatchers(HttpMethod.POST, "/api/course/{id}/book").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/courses").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.POST, "/api/courses/search").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.POST, "/api/courses/{id}/book").hasAnyAuthority(URole.ADMIN.toString())
                 //appointment
                 .antMatchers(HttpMethod.POST, "/api/appointments/appoint").hasAnyAuthority(URole.ADMIN.toString())
                 //links
