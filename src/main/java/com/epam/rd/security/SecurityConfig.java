@@ -97,10 +97,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/courses/page").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/courses").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/courses/search").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/courses/{id}/book").hasAnyAuthority(URole.USER.toString(),URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/courses/{id}/book").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
 
                 //appointment
-                .antMatchers(HttpMethod.POST, "/api/appointments/appoint").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/appointments/appoint").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 //links
                 .antMatchers(HttpMethod.GET, "/api/links").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
                 .antMatchers(HttpMethod.GET, "/api/links/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
