@@ -34,6 +34,8 @@ public class CourseServiceImpl implements CourseService {
 
     private static final String CANNOT_FIND_COURSE = "Cannot find course with ID=";
     private static final String CANNOT_FIND_USER = "Cannot find user with ID=";
+    private static final String CAN_NOT_DELETE_COURSE = "Can't delete course with ID=";
+
     private CourseRepository courseRepository;
     private UserRepository userRepository;
     private UserCourseRepository userCourseRepository;
@@ -48,9 +50,10 @@ public class CourseServiceImpl implements CourseService {
     @Transactional
     @Override
     public void deleteCourse(Long id) {
-        Optional<Course> course = courseRepository.findById(id);
-        if (course.isPresent()) {
+        try {
             courseRepository.deleteById(id);
+        } catch (Exception exception) {
+            throw new CourseProcessingException(CAN_NOT_DELETE_COURSE + id);
         }
     }
 
@@ -68,9 +71,12 @@ public class CourseServiceImpl implements CourseService {
         Course courseToBeUpdated = courseRepository.findById(courseDto.getId())
                 .orElseThrow(() -> new CourseProcessingException(CANNOT_FIND_COURSE));
 
+        if (courseDto.getTitle() != null) {
+            courseToBeUpdated.setTitle(courseDto.getTitle());
+        }
 
         if (courseDto.getDescription() != null) {
-            courseToBeUpdated.setDescription(courseToBeUpdated.getDescription());
+            courseToBeUpdated.setDescription(courseDto.getDescription());
         }
 
         if (courseDto.getPrice() != null && courseDto.getPrice().compareTo(BigDecimal.ZERO) > 0) {
