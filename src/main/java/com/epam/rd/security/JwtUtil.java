@@ -46,25 +46,25 @@ public class JwtUtil {
         Date now = new Date(System.currentTimeMillis());
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
+
+
         Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("id", user.getId());
         claimsMap.put("username", user.getUsername());
         claimsMap.put("role", Collections.singletonList(role));
-
-        return Jwts.builder()
-                .setSubject(user.getUsername())
-                .setClaims(claimsMap)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
+       return doGenerateToken(claimsMap,user.getUsername(),authentication.isAuthenticated());
 
     }
 
 
     private String doGenerateToken(Map<String, Object> claims, String subject, boolean rememberMe) {
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + (rememberMe ? jwtExpirationInMsRememberMe : jwtExpirationInMs))).signWith(SignatureAlgorithm.HS512, secret).compact();
+        return Jwts.builder().
+                setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + (rememberMe ? jwtExpirationInMsRememberMe : jwtExpirationInMs)))
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
     }
 
     public boolean validateToken(String token) {
