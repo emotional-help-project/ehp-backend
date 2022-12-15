@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Base entity created for avoid DRY.
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @MappedSuperclass
 @Data
 @NoArgsConstructor
-public class BaseEntity {
+public class BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -257,7 +257,7 @@ public class UserServiceImpl implements UserService {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         //TODO Password need to encode but  temporarly  I send without encode
         String encodeNewPassword = bCryptPasswordEncoder.encode(newPassword);
-        user.setPassword(newPassword);
+        user.setPassword(encodeNewPassword);
         user.setResetPasswordToken(null);
         userRepository.save(user);
     }
@@ -279,5 +279,6 @@ public class UserServiceImpl implements UserService {
 
         return mailSender;
     }
+
 
 }

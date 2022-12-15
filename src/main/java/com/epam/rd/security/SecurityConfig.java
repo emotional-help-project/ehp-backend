@@ -49,47 +49,95 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http = http.cors().and().csrf().disable();
 
-        http
-                .authorizeRequests()
-
+        http.authorizeRequests()
                 // account
-
                 .antMatchers("/api/account/signin").permitAll()
                 .antMatchers("/api/account/signup").permitAll()
-                .antMatchers("/api/**").permitAll()
-                .antMatchers("/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/account").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers("/").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/forgot").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/forgot/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/forgot").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/forgot/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/account").hasAnyAuthority(URole.ADMIN.toString())
 
                 //Users
 
-                .antMatchers("/api/users/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
                 .antMatchers(HttpMethod.GET, "/api/users").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers("/api/user/profile/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/users/page").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/users/check/{email}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.GET, "/api/users/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.PUT, "/api/users").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.DELETE, "/api/users/{id}").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/users/search").hasAnyAuthority(URole.ADMIN.toString())
 
-                .antMatchers("/api/admin/**").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.GET, "/api/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
-                .antMatchers(HttpMethod.POST, "/api/**").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
-                .antMatchers(HttpMethod.POST, "/api/testTypes/**").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.POST, "/api/answers/**").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.POST, "/api/appoint/**").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.PUT, "/api/**").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.DELETE, "/api/**").hasAnyAuthority(URole.ADMIN.toString())
-                //courses
-                .antMatchers(HttpMethod.DELETE, "/api/courses/**").hasAnyAuthority(URole.ADMIN.toString())
-                .antMatchers(HttpMethod.POST, "/api/courses/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
-                .antMatchers(HttpMethod.PUT, "/api/courses/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                //User Profile
+                .antMatchers(HttpMethod.PUT, "/api/user/profile/update").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/user/profile/update/password").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/user/profile/{id}/info").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/user/profile/{userId}/map/{testId}").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/user/profile/{id}/statistics").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/user/profile/tests").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/user/profile").hasAnyAuthority(URole.ADMIN.toString())
+                //admin
+                .antMatchers(HttpMethod.POST, "/api/admin/test").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/admin/advice").hasAnyAuthority(URole.ADMIN.toString())
+                //answer
+                .antMatchers(HttpMethod.GET, "/api/answers").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.GET, "/api/answers/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.POST, "/api/answers").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/answers").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.DELETE, "/api/answers/{id}").hasAnyAuthority(URole.ADMIN.toString())
+                //course
+                .antMatchers(HttpMethod.POST, "/api/course").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/course").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.DELETE, "/api/course/{id}").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/course/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.GET, "/api/course/page").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                //TODO If  some courses need to home page this permission will be permitall
+                .antMatchers(HttpMethod.GET, "/api/course").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.POST, "/api/course/search").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.POST, "/api/course/{id}/book").hasAnyAuthority(URole.ADMIN.toString())
+                //appointment
+                .antMatchers(HttpMethod.POST, "/api/appointments/appoint").hasAnyAuthority(URole.ADMIN.toString())
+                //links
+                .antMatchers(HttpMethod.GET, "/api/links").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.GET, "/api/links/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.POST, "/api/links").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/links").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.DELETE, "/api/links/{id}").hasAnyAuthority(URole.ADMIN.toString())
                 //psychologic
                 .antMatchers(HttpMethod.POST, "/api/psychologists/search").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
-                //test
-                .antMatchers(HttpMethod.POST, "/api/tests/test/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
-                .antMatchers(HttpMethod.GET, "/api/tests/test/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
-                .antMatchers(HttpMethod.PUT, "/api/tests/test/**").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
-                .antMatchers(HttpMethod.DELETE, "/api/tests/test/**").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/psychologists").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/psychologists").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.DELETE, "/api/psychologists/{id}").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/psychologists/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.GET, "/api/psychologists/available").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/psychologists").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/psychologists/page").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/psychologists/psy/{psychologistId}").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                //Question
+                .antMatchers(HttpMethod.GET, "/api/questions").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.GET, "/api/questions/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.POST, "/api/questions").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/questions").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.DELETE, "/api/questions/{id}").hasAnyAuthority(URole.ADMIN.toString())
+                //tests
+                .antMatchers(HttpMethod.GET, "/api/tests").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.GET, "/api/tests/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.POST, "/api/tests").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/tests").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.DELETE, "/api/tests/{id}").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/tests/test/{id}/init").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/tests/test/{testId}/session/{sessionId}").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/tests//user/{id}").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/tests/test/session/{sessionId}").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                .antMatchers(HttpMethod.POST, "/api/tests/test/session/{sessionId}/finalize").hasAnyAuthority(URole.USER.toString(), URole.ADMIN.toString())
+                //testType
+                .antMatchers(HttpMethod.GET, "/api/testTypes").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.GET, "/api/testTypes/{id}").hasAnyAuthority(URole.ADMIN.toString(), URole.USER.toString())
+                .antMatchers(HttpMethod.POST, "/api/testTypes").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.PUT, "/api/testTypes").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.DELETE, "/api/testTypes/{id}").hasAnyAuthority(URole.ADMIN.toString())
 
                 .anyRequest().authenticated()
                 .and().exceptionHandling()
@@ -98,12 +146,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 // 		Add a filter to validate the tokens with every request
-        http.addFilterBefore(jwtFilter,
-                UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
-    public void configure(WebSecurity web)  {
+    public void configure(WebSecurity web) {
         web
                 .ignoring()
                 .antMatchers(HttpMethod.OPTIONS, "/**")
