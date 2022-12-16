@@ -1,5 +1,6 @@
 package com.epam.rd.service.impl;
 
+import com.epam.rd.exceptions.CourseProcessingException;
 import com.epam.rd.exceptions.PsychologistProcessingException;
 import com.epam.rd.exceptions.PsychologistProcessingException;
 import com.epam.rd.model.dto.PsychologistDto;
@@ -37,6 +38,7 @@ import java.util.Optional;
 public class PsychologistServiceImpl implements PsychologistService {
 
     private static final String CANNOT_FIND_PSYCHOLOGIST = "Cannot find psychologist with ID=";
+    private static final String CAN_NOT_DELETE_PSYCHOLOGIST = "Can't delete psychologist with ID=";
 
     private PsychologistRepository psychologistRepository;
     private StandardPsyWorkDaysRepository standardPsyWorkDaysRepository;
@@ -74,9 +76,10 @@ public class PsychologistServiceImpl implements PsychologistService {
     @Transactional
     @Override
     public void deletePsychologist(Long id) {
-        Optional<Psychologist> psychologist = psychologistRepository.findById(id);
-        if (psychologist.isPresent()) {
+        try {
             psychologistRepository.deleteById(id);
+        } catch (Exception exception) {
+            throw new PsychologistProcessingException(CAN_NOT_DELETE_PSYCHOLOGIST + id);
         }
     }
 
@@ -94,7 +97,7 @@ public class PsychologistServiceImpl implements PsychologistService {
         Psychologist psychologistToBeUpdated = psychologistRepository.findById(psychologistDto.getId())
                 .orElseThrow(() -> new PsychologistProcessingException(CANNOT_FIND_PSYCHOLOGIST));
 
-        if (psychologistDto.getAge() >=18) {
+        if (psychologistDto.getAge() >= 18) {
             psychologistToBeUpdated.setAge(psychologistDto.getAge());
         }
 

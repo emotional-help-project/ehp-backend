@@ -17,9 +17,26 @@ public class CourseController {
 
     private final CourseService courseService;
 
+    @PostMapping
+    public ResponseEntity<?> createCourse(@RequestBody CourseDto courseDto) {
+        return new ResponseEntity<>(courseService.createCourse(courseDto), HttpStatus.CREATED);
+
+    }
+
+    @PutMapping
+    public ResponseEntity<CourseDto> updateCourse(@RequestBody CourseDto courseDto) {
+        return ResponseEntity.ok(courseService.updateCourse(courseDto));
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<CourseDto> getCourseById(@PathVariable Long id) {
         return ResponseEntity.ok(courseService.getCourseById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCourseById(@PathVariable Long id) {
+        courseService.deleteCourse(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/page")
@@ -38,4 +55,9 @@ public class CourseController {
         return courseService.searchCourse(request);
     }
 
+    @PostMapping("/{id}/book")
+    public ResponseEntity<?> bookCourse(@PathVariable Long id,
+                                        @RequestParam Long userId) {
+        return ResponseEntity.ok(courseService.bookCourseForUser(id, userId));
+    }
 }

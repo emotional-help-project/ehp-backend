@@ -1,7 +1,6 @@
 package com.epam.rd.controller;
 
 import com.epam.rd.exceptions.ApiException;
-import com.epam.rd.model.entity.Degree;
 import com.epam.rd.service.CommonService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

@@ -1,6 +1,16 @@
 package com.epam.rd.service;
 
-import com.epam.rd.model.entity.Advice;
+import com.epam.rd.model.dto.AdviceDto;
+import com.epam.rd.payload.request.UpdateAdviceRequest;
 
-public interface AdviceService extends CommonService<Advice,Long>{
+import java.util.List;
+
+public interface AdviceService {
+    void deleteAdvice(Long id);
+
+    AdviceDto updateAdvice(UpdateAdviceRequest updateAdviceRequest);
+
+    List<AdviceDto> getAllAdvice();
+
+    List<AdviceDto> getAllAdviceByTestId(Long testId);
 }

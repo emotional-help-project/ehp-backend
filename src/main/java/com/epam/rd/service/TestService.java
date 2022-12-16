@@ -21,11 +21,15 @@ public interface TestService extends CommonService<Test, Long> {
      */
     TestQuestionsResponse getTestQuestionsPaginated(Long testId, Long sessionId, int skip, int take);
 
-    FinalizeTestResponse finalizeTest(Long sessionId);
+    Long calculateResult(Long sessionId);
+
+    FinalizeTestResponse finalizeTest(Long sessionId, Long userScore);
 
     TestPageForUserResponse getAllTestsForUser(Long userId, int skip, int take);
 
     EmotionMapResponse getEmotionMapByTest(Long userId, Long testId);
 
     UserEmotionStatisticsResponse getUserEmotionStatistics(Long id);
+
+    List<TestShortDetailsResponse> getTestsFinishedByUser(Long userId);
 }

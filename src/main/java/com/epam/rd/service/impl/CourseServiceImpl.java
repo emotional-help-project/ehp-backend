@@ -1,12 +1,18 @@
 package com.epam.rd.service.impl;
 
 import com.epam.rd.exceptions.CourseProcessingException;
+import com.epam.rd.exceptions.UserProcessingException;
 import com.epam.rd.model.dto.CourseDto;
 import com.epam.rd.model.entity.Course;
+import com.epam.rd.model.entity.User;
+import com.epam.rd.model.entity.UserCourse;
 import com.epam.rd.model.mapper.CourseMapper;
 import com.epam.rd.model.search.SearchSpecification;
 import com.epam.rd.payload.request.SearchRequest;
+import com.epam.rd.payload.response.BookedCourseResponse;
 import com.epam.rd.repository.CourseRepository;
+import com.epam.rd.repository.UserCourseRepository;
+import com.epam.rd.repository.UserRepository;
 import com.epam.rd.service.CourseService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,7 +33,12 @@ import java.util.Optional;
 public class CourseServiceImpl implements CourseService {
 
     private static final String CANNOT_FIND_COURSE = "Cannot find course with ID=";
+    private static final String CANNOT_FIND_USER = "Cannot find user with ID=";
+    private static final String CAN_NOT_DELETE_COURSE = "Can't delete course with ID=";
+
     private CourseRepository courseRepository;
+    private UserRepository userRepository;
+    private UserCourseRepository userCourseRepository;
     private CourseMapper courseMapper;
 
     @Transactional
@@ -39,9 +50,10 @@ public class CourseServiceImpl implements CourseService {
     @Transactional
     @Override
     public void deleteCourse(Long id) {
-        Optional<Course> course = courseRepository.findById(id);
-        if (course.isPresent()) {
+        try {
             courseRepository.deleteById(id);
+        } catch (Exception exception) {
+            throw new CourseProcessingException(CAN_NOT_DELETE_COURSE + id);
         }
     }
 
@@ -59,9 +71,12 @@ public class CourseServiceImpl implements CourseService {
         Course courseToBeUpdated = courseRepository.findById(courseDto.getId())
                 .orElseThrow(() -> new CourseProcessingException(CANNOT_FIND_COURSE));
 
+        if (courseDto.getTitle() != null) {
+            courseToBeUpdated.setTitle(courseDto.getTitle());
+        }
 
         if (courseDto.getDescription() != null) {
-            courseToBeUpdated.setDescription(courseToBeUpdated.getDescription());
+            courseToBeUpdated.setDescription(courseDto.getDescription());
         }
 
         if (courseDto.getPrice() != null && courseDto.getPrice().compareTo(BigDecimal.ZERO) > 0) {
@@ -96,6 +111,22 @@ public class CourseServiceImpl implements CourseService {
         SearchSpecification<Course> specification = new SearchSpecification<>(request);
         Pageable pageable = SearchSpecification.getPageable(request.getPage(), request.getSize());
         return courseRepository.findAll(specification, pageable).map(courseMapper::toDto);
+    }
+
+    @Transactional
+    @Override
+    public BookedCourseResponse bookCourseForUser(Long id, Long userId) {
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new CourseProcessingException(CANNOT_FIND_COURSE + id));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserProcessingException(CANNOT_FIND_USER + userId));
+        userCourseRepository.save(new UserCourse()
+                .setCourse(course)
+                .setUser(user));
+        return new BookedCourseResponse()
+                .setCourseTitle(course.getTitle())
+                .setImageUrl(course.getImageUrl())
+                .setEmail(user.getEmail());
     }
 
     private PageRequest createPageRequest(int pageNum, int pageSize) {

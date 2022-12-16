@@ -35,14 +35,31 @@ public class PsychologistController {
         return ResponseEntity.ok(psychologistService.getAppointmentCalendarByPsychologist(psychologistId, currentDateTime));
     }
 
+    @PostMapping
+    public ResponseEntity<?> createPsychologist(@Valid @RequestBody PsychologistDto psychologistDto) {
+        return ResponseEntity.ok(psychologistService.createPsychologist(psychologistDto));
+
+    }
+
+    @PutMapping
+    public ResponseEntity<PsychologistDto> updatePsychologist(@Valid @RequestBody PsychologistDto psychologistDto) {
+        return ResponseEntity.ok(psychologistService.updatePsychologist(psychologistDto));
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<PsychologistDto> getPsychologistById(@PathVariable Long id) {
         return ResponseEntity.ok(psychologistService.getPsychologistById(id));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePsychologistById(@PathVariable Long id) {
+        psychologistService.deletePsychologist(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/page")
     public Page<PsychologistDto> getAllPsychologistsPaginated(@RequestParam(required = false, defaultValue = "1") int pageNum,
-                                                  @RequestParam(required = false, defaultValue = "5") int pageSize) {
+                                                              @RequestParam(required = false, defaultValue = "5") int pageSize) {
         return psychologistService.getAllPsychologistsPaginated(pageNum, pageSize);
     }
 

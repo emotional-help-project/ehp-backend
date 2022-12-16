@@ -5,6 +5,7 @@ import com.epam.rd.model.entity.User;
 import com.epam.rd.service.UserService;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 
 @RestController
@@ -21,15 +21,25 @@ public class ResetPasswordController {
     @Autowired
     private UserService userService;
     @Autowired
-    private JavaMailSender mailSender;
-//Genreate token by email or Token to Send email
+    JavaMailSender mailSender;
+    private String link;
+
+    @Value("${link}")
+    public void setPath(String path) {
+        this.link = path;
+    }
+
+    /**
+     * Generate token by email or Token to Send email
+     */
     @PostMapping()
-    public String processForgetPassword(@RequestParam(name = "email") String email, HttpServletRequest request) {
+    public String processForgetPassword(@RequestParam(name = "email") String email) {
         String token = RandomString.make(50);
         System.out.println(email + "   \n" + token);
         try {
             userService.updateResetPassword(token, email);
-            String resetPasswordLink = request.getRequestURL().toString() + "/reset?token=" + token;
+            String resetPasswordLink = link + "/reset-password?token=" + token;
+            System.out.println(resetPasswordLink);
             sendEmail(email, resetPasswordLink);
             System.out.println(resetPasswordLink);
         } catch (UserNotFoundException | MessagingException | UnsupportedEncodingException e) {
@@ -37,50 +47,50 @@ public class ResetPasswordController {
         }
         return token;
     }
-//GetUserbytoken
+
+    /**
+     * Get User by token
+     */
+
     @GetMapping()
     public ResponseEntity<User> findByToken(@RequestParam(value = "token") String token) {
         return ResponseEntity.ok(userService.get(token));
     }
-//
-    @GetMapping("/reset")
-    public ResponseEntity<User> resetPasswordForm(@RequestParam(name = "token") String token,
-                                                  HttpServletRequest request) throws Exception {
+
+    @GetMapping("/reset-password")
+    public ResponseEntity<User> resetPasswordForm(@RequestParam(name = "token") String token) throws Exception {
         User user = userService.get(token);
         if (user == null) {
             throw new Exception("Invalid Token");
         }
-
 //        userService.updatePassword(user, password);
         return ResponseEntity.ok(user);
     }
-/**
- * update password for new
- */
-    @PostMapping("/reset")
-    public ResponseEntity<User> resetPassword(@RequestParam(name = "token") String token,
-                                              @RequestParam(name = "password") String password,
-                                              HttpServletRequest request) throws Exception {
-        User user=userService.get(token);
+
+    /**
+     * update password for new
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam(name = "token") String token,
+                                              @RequestParam(name = "password") String password) throws Exception {
+        User user = userService.get(token);
         if (user == null) {
             throw new Exception("Invalid Token");
+        } else {
+            userService.updatePassword(user, password);
         }
-        else {
-            userService.updatePassword(user,password);
-            throw new Exception("Successfully updated ! ");
-        }
-//        return ResponseEntity.ok().build();
-                    }
+        return ResponseEntity.noContent().build();
+    }
 
     public void sendEmail(String email, String resetPasswordLink) throws MessagingException, UnsupportedEncodingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message);
         messageHelper.setFrom("contact@help.com", "Emotional Help Support");
         messageHelper.setTo(email);
-        String subject = "Her is  the link to reset your password";
+        String subject = "Emotional Help Password reset confirmation";
         String content = "<p>Hello</p>" +
-                "You have a request to recover your password <br>" +
-                "Click the link below to change your password:<br> " +
+                "There was recently a request to change the password on your account. <br>" +
+                "If you requested this password change, please click the link below to set a new password:<br> " +
                 "<a href=\"" + resetPasswordLink + "\">Change my password </a>";
         messageHelper.setSubject(subject);
         messageHelper.setText(content, true);

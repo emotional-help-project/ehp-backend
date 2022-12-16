@@ -3,11 +3,10 @@ package com.epam.rd.service;
 import com.epam.rd.exceptions.UserNotFoundException;
 import com.epam.rd.model.dto.UserDto;
 import com.epam.rd.model.entity.User;
-import com.epam.rd.payload.request.LoginRequest;
-import com.epam.rd.payload.request.SearchRequest;
-import com.epam.rd.payload.request.SignupRequest;
-import com.epam.rd.payload.request.UpdateUserProfileRequest;
+import com.epam.rd.payload.request.*;
 import com.epam.rd.payload.response.JWTTokenSuccessResponse;
+import com.epam.rd.payload.response.UpdateUserPasswordResponse;
+import com.epam.rd.payload.request.UpdateUserPasswordRequest;
 import org.springframework.data.domain.Page;
 
 import java.security.Principal;
@@ -40,6 +39,8 @@ public interface UserService {
     Page<UserDto> searchUser(SearchRequest request);
 
     UserDto updateUserProfile(UpdateUserProfileRequest updateUserProfile);
+
+    UpdateUserPasswordResponse updateUserPassword(UpdateUserPasswordRequest updateUserPasswordRequest);
 
     User get(String resetPasswordToken);
 

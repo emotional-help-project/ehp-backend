@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Base entity created for avoid DRY.

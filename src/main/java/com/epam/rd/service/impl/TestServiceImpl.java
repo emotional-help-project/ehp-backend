@@ -167,7 +167,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
 
     @Transactional
     @Override
-    public FinalizeTestResponse finalizeTest(Long sessionId) {
+    public Long calculateResult(Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new SessionProcessingException(CANNOT_FIND_SESSION + sessionId));
         SessionDto sessionDto = sessionMapper.toDto(session);
@@ -175,13 +175,22 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
 
         if (!checkIfAllQuestionsAreAnswered(sessionDto, userFinalAnswersForTest)) return null;
 
-        long userScore = calculateUserScore(userFinalAnswersForTest);
-        Advice advice = adviceRepository.findAdviceByUserScore(userScore)
+        return calculateUserScore(userFinalAnswersForTest);
+    }
+
+    @Transactional
+    @Override
+    public FinalizeTestResponse finalizeTest(Long sessionId, Long userScore) {
+
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new SessionProcessingException(CANNOT_FIND_SESSION + sessionId));
+
+        Advice advice = adviceRepository.findAdviceByUserScoreAndTest(userScore, session.getTest())
                 .orElseThrow(() -> new AdviceProcessingException(CANNOT_FIND_ADVICE_FOR_USER_SCORE + userScore));
 
         finalizeAndSaveTestResult(userScore, advice, session);
 
-        updateSessionToFinished(sessionDto);
+        updateSessionToFinished(sessionMapper.toDto(session));
 
         return new FinalizeTestResponse()
                 .setAdviceDescription(advice.getTitle())
@@ -255,6 +264,27 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         return new UserEmotionStatisticsResponse().setEmotionStatistics(emotionStatistics);
     }
 
+    @Transactional
+    @Override
+    public List<TestShortDetailsResponse> getTestsFinishedByUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserProcessingException(CANNOT_FIND_USER + userId));
+
+        List<TestShortDetailsResponse> testsFinishedByUser = new ArrayList<>();
+        List<Session> finishedSessionsByUser = sessionRepository.findAllByUserAndFinished(user, true);
+
+        finishedSessionsByUser.stream().map(Session::getTest).distinct()
+                .forEach(test -> testsFinishedByUser.add(
+                        new TestShortDetailsResponse()
+                                .setTestId(test.getId())
+                                .setTestTitle(test.getTitle())
+                                .setImageUrl(test.getImageUrl())
+                ));
+
+        return testsFinishedByUser;
+    }
+
+
     private List<AnswerDto> getUsersAllAnswersForTestBySession(SessionDto session) {
 
         List<UserAnswersDto> userAnswersDtoList =
@@ -302,8 +332,10 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         List<Question> allQuestionsOfTest = questionRepository.findAllByTest(test);
 
         for (Question question : allQuestionsOfTest) {
-            if (userFinalAnswersForTest.stream().map(AnswerDto::getQuestion)
-                    .noneMatch(userQuestion -> userQuestion.equals(question))) {
+            if (!question.getMultipleAnswers() &&
+                    userFinalAnswersForTest.stream().map(AnswerDto::getQuestion)
+                            .noneMatch(userQuestion -> userQuestion.equals(question)
+                            )) {
                 return false;
             }
         }
