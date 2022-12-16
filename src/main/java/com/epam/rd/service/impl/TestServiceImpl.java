@@ -185,7 +185,7 @@ public class TestServiceImpl extends BaseServiceImpl<Test, Long> implements Test
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new SessionProcessingException(CANNOT_FIND_SESSION + sessionId));
 
-        Advice advice = adviceRepository.findAdviceByUserScore(userScore)
+        Advice advice = adviceRepository.findAdviceByUserScoreAndTest(userScore, session.getTest())
                 .orElseThrow(() -> new AdviceProcessingException(CANNOT_FIND_ADVICE_FOR_USER_SCORE + userScore));
 
         finalizeAndSaveTestResult(userScore, advice, session);
