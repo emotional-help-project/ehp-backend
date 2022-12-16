@@ -143,6 +143,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 //advice
                 .antMatchers(HttpMethod.DELETE, "/api/advice/{id}").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/advice").hasAnyAuthority(URole.ADMIN.toString())
+                .antMatchers(HttpMethod.GET, "/api/advice/testId").hasAnyAuthority(URole.ADMIN.toString())
 
                 .anyRequest().authenticated()
                 .and().exceptionHandling()

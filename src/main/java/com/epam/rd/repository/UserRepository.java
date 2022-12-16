@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
     Optional<User> findByEmail(String username);
-    public User findByResetPasswordToken(String token);
+    User findByResetPasswordToken(String token);
     int countUsersByRoleLike(URole role);
 
 

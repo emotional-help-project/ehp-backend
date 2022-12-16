@@ -5,9 +5,7 @@ import com.epam.rd.exceptions.UserProcessingException;
 import com.epam.rd.model.dto.AdviceDto;
 import com.epam.rd.model.entity.Advice;
 import com.epam.rd.model.entity.Test;
-import com.epam.rd.model.entity.User;
 import com.epam.rd.model.mapper.AdviceMapper;
-import com.epam.rd.payload.request.AdviceAdminRequest;
 import com.epam.rd.payload.request.UpdateAdviceRequest;
 import com.epam.rd.repository.AdviceRepository;
 import com.epam.rd.repository.TestRepository;
@@ -16,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,7 +22,7 @@ import java.util.Optional;
 public class AdviceServiceImpl implements AdviceService {
 
     private static final String CANNOT_FIND_ADVICE_BY_ID = "Cannot find advice with ID=";
-    private static final String CANNOT_FIND_TEST = "Cannot find test with ID=";
+    private static final String CANNOT_FIND_TEST_BY_ID = "Cannot find test with ID=";
 
     private final AdviceRepository adviceRepository;
     private final TestRepository testRepository;
@@ -59,13 +58,32 @@ public class AdviceServiceImpl implements AdviceService {
 
         if (updateAdviceRequest.getTestId() != null) {
             Test test = testRepository.findById(updateAdviceRequest.getTestId())
-                    .orElseThrow(() -> new TestProcessingException(CANNOT_FIND_TEST + updateAdviceRequest.getTestId()));
+                    .orElseThrow(() -> new TestProcessingException(CANNOT_FIND_TEST_BY_ID + updateAdviceRequest.getTestId()));
 
             updatedAdvice.setTest(test);
         }
 
         adviceRepository.save(updatedAdvice);
         return adviceMapper.toDto(updatedAdvice);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<AdviceDto> getAllAdvice() {
+        return adviceRepository.findAll().stream()
+                .map(adviceMapper::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<AdviceDto> getAllAdviceByTestId(Long testId) {
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new TestProcessingException(CANNOT_FIND_TEST_BY_ID + testId));
+
+        return adviceRepository.findAllByTest(test).stream()
+                .map(adviceMapper::toDto)
+                .toList();
     }
 
 }

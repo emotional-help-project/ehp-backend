@@ -25,4 +25,13 @@ public class AdviceController {
         return ResponseEntity.ok(adviceService.updateAdvice(updateAdviceRequest));
     }
 
+    @GetMapping
+    public ResponseEntity<?> getAll() {
+        return ResponseEntity.ok(adviceService.getAllAdvice());
+    }
+
+    @GetMapping("/testId")
+    public ResponseEntity<?> getAllAdviceByTestId(@RequestParam Long testId) {
+        return ResponseEntity.ok(adviceService.getAllAdviceByTestId(testId));
+    }
 }
