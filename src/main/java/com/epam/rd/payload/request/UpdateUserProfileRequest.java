@@ -1,18 +1,17 @@
 package com.epam.rd.payload.request;
 
-import com.epam.rd.annotations.PasswordMatches;
 import com.epam.rd.annotations.ValidEmail;
-import com.epam.rd.annotations.ValidPassword;
 import com.epam.rd.model.enumerations.Gender;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 
 @Data
+@Accessors(chain = true)
 public class UpdateUserProfileRequest {
 
     private Long id;

@@ -13,7 +13,6 @@ import com.epam.rd.payload.response.JWTTokenSuccessResponse;
 import com.epam.rd.payload.response.UpdateUserPasswordResponse;
 import com.epam.rd.repository.UserRepository;
 import com.epam.rd.security.JwtUtil;
-import com.epam.rd.security.UserSpecial;
 import com.epam.rd.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -47,6 +46,7 @@ public class UserServiceImpl implements UserService {
     private static final String USER_DOESNT_EXIST_BY_EMAIL = "A user with this email does not exist";
     private static final String CANNOT_FIND_USER_BY_ID = "Cannot find user with ID=";
     private static final String UPDATE_EXCEPTION = "Can't update non existing data";
+    private static final String CAN_NOT_DELETE_USER = "Can't delete user with ID=";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -143,9 +143,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void deleteUser(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
+        try {
             userRepository.deleteById(id);
+        } catch (Exception exception) {
+            throw new UserProcessingException(CAN_NOT_DELETE_USER + id);
         }
     }
 

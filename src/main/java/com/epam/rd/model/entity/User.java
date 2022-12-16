@@ -3,6 +3,7 @@ package com.epam.rd.model.entity;
 import com.epam.rd.model.enumerations.Gender;
 import com.epam.rd.model.enumerations.URole;
 import lombok.*;
+import lombok.experimental.Accessors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -16,6 +17,7 @@ import java.util.Set;
 @Entity(name = "users")
 @NoArgsConstructor
 @Data
+@Accessors(chain = true)
 public class User  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

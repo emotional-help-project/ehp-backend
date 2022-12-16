@@ -5,6 +5,7 @@ import com.epam.rd.annotations.ValidEmail;
 import com.epam.rd.annotations.ValidPassword;
 import com.epam.rd.model.enumerations.Gender;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +14,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @PasswordMatches
+@Accessors(chain = true)
 public class SignupRequest {
 
     @Size(min = 2, max = 20, message = "First Name should be between 2 and 20 characters")
